@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>WRD - Data w/Timing</title>
+  <link rel="stylesheet" href="index.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+  <body>
+    <script src="/LapTimingDisplay/index.js"></script>
+    <div class="container">
+      <div class="top-panel">
+        <div id="rpmbar" class="rpm-bar"></div>
+      </div>
+      <div class="top-panel-thousands-marks">
+        <div class="grid-item grid-item-zero">
+          <div class='grid-item-p'><p>0</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>1</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>2</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>3</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>4</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>5</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>6</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>7</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>8</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>9</p></div>
+        </div>
+      </div>
+
+      <div class="middle-panel">
+        <!-- Top Row -->
+        <div class="middle-info-panel">
+          <p class="data-title">Coolant:</p>
+          <hr />
+          <p id="ect" class="data-reading">-</p>
+        </div>
+        <div class="middle-info-panel">
+          <p class="data-title">TPS:</p>
+          <hr />
+          <p id="tps" class="data-reading">-</p>
+        </div>
+        <div class="middle-info-panel">
+          <p class="data-title">Oil Temp:</p>
+          <hr />
+          <p id="oilTemp" class="data-reading">-</p>
+        </div>
+        <div class="middle-info-panel">
+          <p class="data-title">RPM:</p>
+          <hr />
+          <p id="rpmNum" class="data-reading">-</p>
+        </div>
+
+        <!-- Bottom Row -->
+        <div class="middle-info-panel">
+          <p class="data-title">IAT:</p>
+          <hr />
+          <p id="iat" class="data-reading">-</p>
+        </div>
+        
+        <div class="middle-info-panel">
+          <p class="data-title">Voltage:</p>
+          <hr />
+          <p id="voltage" class="data-reading">-</p>
+        </div>
+        <div class="middle-info-panel">
+          <p class="data-title">Oil Pressure:</p>
+          <hr />
+          <p id="oilPressure" class="data-reading">-</p>
+        </div>
+        <div class="middle-info-panel">
+          <p class="data-title">Speed:</p>
+          <hr />
+          <p id="speed" class="data-reading">-</p>
+        </div>
+      </div>
+
+      <div class="bottom-panel">
+        <div class="bottom-info-panel">
+          <p class="data-title">Current Lap:</p>
+          <hr />
+          <p id="currentLap" class="data-reading">00.00.000</p>
+        </div>
+        <div class="bottom-info-panel">
+          <p class="data-title">Best Lap:</p>
+          <hr />
+          <p id="bestLap" class="data-reading">00.00.000</p>
+        </div>
+        <div class="bottom-info-panel">
+          <p class="data-title">Last Lap:</p>
+          <hr />
+          <p id="lastLap" class="data-reading">00.00.000</p>
+        </div>
+        <div class="bottom-info-panel">
+          <p class="data-title">PB Lap:</p>
+          <hr />
+          <p id="pbLap" class="data-reading">00.00.000</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
