@@ -1,1 +1,3 @@
-# wills-race-dash-go
+# Wills Race Dash - Go edition
+
+Setup.
