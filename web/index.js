@@ -1,46 +1,46 @@
-var socket = io.connect('localhost:3000');
+window.onload = function () {
+  var conn;
+  var msg = document.getElementById("msg");
+  var log = document.getElementById("log");
 
-socket.on('CANBusMessage', (data) => {  
-  // if (data.changeDisplay === 1)
-  //   window.location.href = 'http://localhost:3000/LapTimingDisplay';
+  function appendLog(item) {
+      var doScroll = log.scrollTop > log.scrollHeight - log.clientHeight - 1;
+      log.appendChild(item);
+      if (doScroll) {
+          log.scrollTop = log.scrollHeight - log.clientHeight;
+      }
+  }
 
-  var rpmBar = document.getElementById('rpmbar');
-  var rpmNum = document.getElementById('rpmNum');
-  var speed = document.getElementById('speed');
-  var gear = document.getElementById('gear');
-  var voltage = document.getElementById('voltage');
-  var iat = document.getElementById('iat');
-  var ect = document.getElementById('ect');
-  var tpsBar = document.getElementById('tpsbar');
-  var tps = document.getElementById('tps');
-  var map = document.getElementById('map');
-  var lambdaRatio = document.getElementById('lambdaRatio');
-  // var inj = document.getElementById('inj');
-  // var ign = document.getElementById('ign');
-  var oilTemp = document.getElementById('oilTemp');
-  var oilPressure = document.getElementById('oilPressure');
-  
-  // Assign data to UI controls
-  rpmBar.style.width = ((data.rpm / 9000) * 100) + '%';
+  document.getElementById("form").onsubmit = function () {
+      if (!conn) {
+          return false;
+      }
+      if (!msg.value) {
+          return false;
+      }
+      conn.send(msg.value);
+      msg.value = "";
+      return false;
+  };
 
-  // if (tpsBar.style.height !== data.tps + '%')
-    tpsBar.style.height = data.tps + '%';
-
-  // if (rpmNum.textContent !== data.rpm)
-    rpmNum.textContent = data.rpm;
-  
-  // if (speed.textContent !== data.speed)
-    speed.textContent = data.speed;
-  
-  gear.textContent = data.gear;
-  voltage.textContent = data.voltage;  
-  iat.textContent = data.iat;
-  ect.textContent = data.ect;
-  tps.textContent = data.tps;
-  map.textContent = data.map;
-  lambdaRatio.textContent = data.lambdaRatio;
-  // inj.textContent = data.inj;
-  // ign.textContent = data.ign;
-  oilTemp.textContent = data.oilTemp;
-  oilPressure.textContent = data.oilPressure;
-});
+  if (window["WebSocket"]) {
+      conn = new WebSocket("ws://" + document.location.host + "/ws");
+      conn.onclose = function (evt) {
+          var item = document.createElement("div");
+          item.innerHTML = "<b>Connection closed.</b>";
+          appendLog(item);
+      };
+      conn.onmessage = function (evt) {
+          var messages = evt.data.split('\n');
+          for (var i = 0; i < messages.length; i++) {
+              var item = document.createElement("div");
+              item.innerText = messages[i];
+              appendLog(item);
+          }
+      };
+  } else {
+      var item = document.createElement("div");
+      item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
+      appendLog(item);
+  }
+};

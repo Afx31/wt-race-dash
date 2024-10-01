@@ -1,2 +1,4 @@
+# Executable on linux doesn't contain file extension
+#wills-race-dash-go
+*.exe
 *.csv
-wills-race-dash-go-exe
