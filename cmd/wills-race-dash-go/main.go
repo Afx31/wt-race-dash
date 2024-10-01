@@ -1,75 +1,60 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"flag"
-	"net/http"
-	"github.com/gorilla/websocket"
+    "fmt"
+    "log"
+		"flag"
+    "net/http"
+    
+		"github.com/gorilla/websocket"
 )
 
 var addr = flag.String("addr", ":8080", "http service address")
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize: 1024,
-	WriteBufferSize: 1024,
-}
-
-func handleBaseHttp(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.URL)
-	if r.URL.Path != "/" {
-		http.Error(w, "Not found", http.StatusNotFound)
-		return
-	}
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	http.ServeFile(w, r, "home.html")
+    ReadBufferSize:  1024,
+    WriteBufferSize: 1024,
 }
 
 func handleWs(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+    conn, err := upgrader.Upgrade(w, r, nil)
+    if err != nil {
+        log.Println("Error upgrading WebSocket: ", err)
+        return
+    }
+    defer conn.Close()
 
-	for {
-		fmt.Println("test1")
-		messageType, p, err := conn.ReadMessage()
-		fmt.Println("test2")
-		if err != nil {
-			fmt.Println("test3")
-			log.Println(err)
-			return
-		}
-		fmt.Println("----")
-		fmt.Println(messageType)
-		fmt.Println(p)
-		fmt.Println("----")
-		if err := conn.WriteMessage(messageType, p); err != nil {
-			fmt.Println("test4")
-			log.Println(err)
-			return
-		}
-		fmt.Println("test5")
-	}
+    for {
+        // Reading message
+        messageType, p, err := conn.ReadMessage()
+        if err != nil {
+            log.Println("Read error: ", err)
+            return
+        }
+        fmt.Println("Received: ", string(p))
+
+        // Writing message back
+        //if err := conn.WriteMessage(websocket.TextMessage, p); err != nil {
+				if err := conn.WriteMessage(messageType, p); err != nil {
+            log.Println("Write error:", err)
+            return
+        }
+    }
 }
 
 func main() {
-	fmt.Println("--- Running ---")
+    fmt.Println("--- Server running ---")
 
-	flag.Parse()
-	// Setup the base HTTP connection first
-	http.HandleFunc("/", handleBaseHttp)
-	// Then upgrade to the WebSocket connection
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		handleWs(w, r)
-	})
-	
-	err := http.ListenAndServe(*addr, nil)
-	if err != nil {
-		log.Fatal("ListenAndServer: ", err)
-	}
+    // Serve all static files from the 'web' directory
+    fs := http.FileServer(http.Dir("../../web"))
+    http.Handle("/", fs)
+
+    // Handle WebSocket connection
+    http.HandleFunc("/ws", handleWs)
+
+		fmt.Println("Server starting at :8080")
+		err := http.ListenAndServe(*addr, nil)
+		if err != nil {
+			log.Fatal("ListenAndServe: ", err)
+		}
 }
