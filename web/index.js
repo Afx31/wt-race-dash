@@ -1,7 +1,7 @@
-const socket = new WebSocket("ws://" + document.location.host + "/ws");
+const socket = new WebSocket('ws://' + document.location.host + '/ws');
 
 socket.onopen = function(event) {
-  console.log("Connected to WebSocket server.");
+  console.log('Connected to WebSocket server.');
 };
 
 socket.onmessage = function(event) {
@@ -49,9 +49,9 @@ socket.onmessage = function(event) {
 };
 
 socket.onerror = function(error) {
-  console.log("WebSocket error:", error);
+  console.log('WebSocket error:', error);
 };
 
 socket.onclose = function(event) {
-  console.log("WebSocket connection closed:", event);
+  console.log('WebSocket connection closed:', event);
 };

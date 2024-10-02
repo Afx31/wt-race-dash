@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>WRD - Data Logging</title>
+  <link rel="stylesheet" href="/DataLoggingDisplay/index.css">
+</head>
+  <body>
+    <script src="/DataLoggingDisplay/index.js"></script>
+    <div class="container">
+      <div class="top-panel">
+        <div id="rpmbar" class="rpm-bar"></div>
+      </div>
+      <div class="top-panel-thousands-marks">
+        <div class="grid-item grid-item-zero">
+          <div class='grid-item-p'><p>0</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>1</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>2</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>3</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>4</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>5</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>6</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>7</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>8</p></div>
+        </div>
+        <div class="grid-item">
+          <div class='grid-item-p'><p>9</p></div>
+        </div>
+      </div>
+
+      <div class="left-panel">
+        <div class="info-panel-left">
+          <p class="data-title">Coolant:</p>
+          <hr />
+          <p id="ect" class="data-reading">-</p>
+        </div>
+        <div class="info-panel-left">
+          <p class="data-title">IAT:</p>
+          <hr />
+          <p id="iat" class="data-reading">-</p>
+        </div>
+        <div class="info-panel-left">
+          <p class="data-title">MAP:</p>
+          <hr />
+          <p id="map" class="data-reading">-</p>
+        </div>
+        <div class="info-panel-left">
+          <p class="data-title">Air/Fuel:</p>
+          <hr />
+          <p id="lambdaRatio" class="data-reading">-</p>
+        </div>
+      </div>
+
+      <div class="middle-panel">
+        <div class="info-panel-middle">
+          <p class="data-title">RPM:</p>
+          <hr />
+          <p id="rpmNum" class="data-reading">-</p>
+        </div>
+        <div class="info-panel-middle">
+          <p class="data-title">Speed:</p>
+          <hr />
+          <p id="speed" class="data-reading">-</p>
+        </div>
+        <div class="info-panel-middle">
+          <p class="data-title">Injectors:</p>
+          <hr />
+          <p id="inj" class="data-reading">-</p>
+        </div>
+        <div class="info-panel-middle">
+          <p class="data-title">Ignition Advance:</p>
+          <hr />
+          <p id="ign" class="data-reading">-</p>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="info-panel-right">
+          <p class="data-title">Oil Temp:</p>
+          <hr />
+          <p id="oilTemp" class="data-reading">-</p>
+        </div>
+        <div class="info-panel-right">
+          <p class="data-title">Oil Pressure:</p>
+          <hr />
+          <p id="oilPressure" class="data-reading">-</p>
+        </div>
+        <div class="info-panel-right">
+          <p class="data-title">TPS:</p>
+          <hr />
+          <p id="tps" class="data-reading">-</p>
+        </div>
+        <div class="info-panel-right">
+          <p class="data-title">Voltage:</p>
+          <hr />
+          <p id="voltage" class="data-reading">-</p>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>
