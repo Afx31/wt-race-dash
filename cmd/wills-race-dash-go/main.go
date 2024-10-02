@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -36,6 +37,17 @@ type CanData struct {
 	OilPressure uint16
 }
 
+// Data conversion consts
+// Oil Temp
+const A = 0.0014222095
+const B = 0.00023729017
+const C = 9.3273998E-8
+// Oil Pressure
+const originalLow float64 = 0 //0.5
+const originalHigh float64 = 5 //4.5
+const desiredLow float64 = -100 //0
+const desiredHigh float64 = 1100 //1000
+
 func handleWs(w http.ResponseWriter, r *http.Request) {
     conn, err := upgrader.Upgrade(w, r, nil)
     if err != nil {
@@ -56,12 +68,34 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
 
 			switch frame.ID {
 				case 660:
-				//case 1632:
+				// case 1632:
 					canData.Rpm = binary.BigEndian.Uint16(frame.Data[0:2])
 					canData.Speed = binary.BigEndian.Uint16(frame.Data[2:4])
 					canData.Gear = frame.Data[4]
 					canData.Voltage = frame.Data[5] / 10
-			}
+				case 661:
+				// case 1633:
+					canData.Iat = binary.BigEndian.Uint16(frame.Data[0:2])
+					canData.Ect = binary.BigEndian.Uint16(frame.Data[2:4])
+				case 662:
+				// case 1634:
+					canData.Tps = binary.BigEndian.Uint16(frame.Data[0:2])
+					canData.Map = binary.BigEndian.Uint16(frame.Data[2:4]) / 10
+				case 664:
+				// case 1636:
+					canData.LambdaRatio = 32768 / binary.BigEndian.Uint16(frame.Data[0:2])
+				case 667:
+				// case 1639:
+					// Oil Temp
+					oilTempResistance := binary.BigEndian.Uint16(frame.Data[0:2])
+					kelvinTemp := 1 / (A + B * math.Log(float64(oilTempResistance)) + C * math.Pow(math.Log(float64(oilTempResistance)), 3))
+					canData.OilTemp = uint16(kelvinTemp - 273.15)
+		
+					// Oil Pressure
+					oilPressureResistance := float64(binary.BigEndian.Uint16(frame.Data[2:4])) / 819.2
+					kPaValue := ((float64(oilPressureResistance) - originalLow) / (originalHigh - originalLow) * (desiredHigh - desiredLow)) + desiredLow
+					canData.OilPressure = uint16(math.Round(kPaValue * 0.145038)) // Convert to psi
+				}
 
 			jsonData, err := json.Marshal(canData)
 			if err != nil {
