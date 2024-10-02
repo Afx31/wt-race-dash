@@ -1,46 +1,57 @@
-window.onload = function () {
-  var conn;
-  var msg = document.getElementById("msg");
-  var log = document.getElementById("log");
+const socket = new WebSocket("ws://" + document.location.host + "/ws");
 
-  function appendLog(item) {
-      var doScroll = log.scrollTop > log.scrollHeight - log.clientHeight - 1;
-      log.appendChild(item);
-      if (doScroll) {
-          log.scrollTop = log.scrollHeight - log.clientHeight;
-      }
-  }
+socket.onopen = function(event) {
+  console.log("Connected to WebSocket server.");
+};
 
-  document.getElementById("form").onsubmit = function () {
-      if (!conn) {
-          return false;
-      }
-      if (!msg.value) {
-          return false;
-      }
-      conn.send(msg.value);
-      msg.value = "";
-      return false;
-  };
+socket.onmessage = function(event) {
+  const data = JSON.parse(event.data);
 
-  if (window["WebSocket"]) {
-      conn = new WebSocket("ws://" + document.location.host + "/ws");
-      conn.onclose = function (evt) {
-          var item = document.createElement("div");
-          item.innerHTML = "<b>Connection closed.</b>";
-          appendLog(item);
-      };
-      conn.onmessage = function (evt) {
-          var messages = evt.data.split('\n');
-          for (var i = 0; i < messages.length; i++) {
-              var item = document.createElement("div");
-              item.innerText = messages[i];
-              appendLog(item);
-          }
-      };
-  } else {
-      var item = document.createElement("div");
-      item.innerHTML = "<b>Your browser does not support WebSockets.</b>";
-      appendLog(item);
-  }
+  var rpmBar = document.getElementById('rpmbar');
+  var rpmNum = document.getElementById('rpmNum');
+  var speed = document.getElementById('speed');
+  var gear = document.getElementById('gear');
+  var voltage = document.getElementById('voltage');
+  var iat = document.getElementById('iat');
+  var ect = document.getElementById('ect');
+  var tpsBar = document.getElementById('tpsbar');
+  var tps = document.getElementById('tps');
+  var map = document.getElementById('map');
+  var lambdaRatio = document.getElementById('lambdaRatio');
+  // var inj = document.getElementById('inj');
+  // var ign = document.getElementById('ign');
+  var oilTemp = document.getElementById('oilTemp');
+  var oilPressure = document.getElementById('oilPressure');
+  
+  // Assign data to UI controls
+  rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
+
+  // if (tpsBar.style.height !== data.tps + '%')
+    tpsBar.style.height = data.Tps + '%';
+
+  // if (rpmNum.textContent !== data.rpm)
+    rpmNum.textContent = data.Rpm;
+  
+  // if (speed.textContent !== data.speed)
+    speed.textContent = data.Speed;
+  
+  gear.textContent = data.Gear;
+  voltage.textContent = data.Voltage;  
+  iat.textContent = data.Iat;
+  ect.textContent = data.Ect;
+  tps.textContent = data.Tps;
+  map.textContent = data.Map;
+  lambdaRatio.textContent = data.LambdaRatio;
+  // inj.textContent = data.inj;
+  // ign.textContent = data.ign;
+  oilTemp.textContent = data.OilTemp;
+  oilPressure.textContent = data.OilPressure;
+};
+
+socket.onerror = function(error) {
+  console.log("WebSocket error:", error);
+};
+
+socket.onclose = function(event) {
+  console.log("WebSocket connection closed:", event);
 };
