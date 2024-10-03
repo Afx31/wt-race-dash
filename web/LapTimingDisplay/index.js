@@ -14,31 +14,39 @@ document.addEventListener('DOMContentLoaded', () => {
   var oilTemp = document.getElementById('oilTemp');
   var oilPressure = document.getElementById('oilPressure');
 
+  var currentLap = document.getElementById('currentLap');
+
   socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
-    // RPM progressive bar
-    rpmBar.style.setProperty('max-width', '1920px', 'important');
-    var rpmbarPercentage = (data.Rpm / 9000) * 100;
 
-    // Assign data to UI controls
-    rpmBar.style.width = `${rpmbarPercentage}%`;
-    rpmNum.textContent = data.Rpm;
-    speed.textContent = data.Speed;
-    voltage.textContent = (data.Voltage / 10).toFixed(1);
-    iat.textContent = data.Iat;
-    ect.textContent = data.Ect;
-    tps.textContent = data.Tps;
-    oilTemp.textContent = data.OilTemp;
-    oilPressure.textContent = data.OilPressure;
+    switch (data.Type) {
+      case 1:
+        // RPM progressive bar
+        rpmBar.style.setProperty('max-width', '1920px', 'important');
+        var rpmbarPercentage = (data.Rpm / 9000) * 100;
 
-    // RPM Bar colouring
-    var percentInt = parseInt(rpmBar.style.width);
-    if (percentInt > 85)
-      rpmBar.style.setProperty('background-color', 'red', 'important');
-    else if (percentInt > 60)
-      rpmBar.style.setProperty('background-color', 'yellow', 'important');
-    else
-      rpmBar.style.setProperty('background-color', 'green', 'important');
+        // Assign data to UI controls
+        rpmBar.style.width = `${rpmbarPercentage}%`;
+        rpmNum.textContent = data.Rpm;
+        speed.textContent = data.Speed;
+        voltage.textContent = (data.Voltage / 10).toFixed(1);
+        iat.textContent = data.Iat;
+        ect.textContent = data.Ect;
+        tps.textContent = data.Tps;
+        oilTemp.textContent = data.OilTemp;
+        oilPressure.textContent = data.OilPressure;
+
+        // RPM Bar colouring
+        var percentInt = parseInt(rpmBar.style.width);
+        if (percentInt > 85)
+          rpmBar.style.setProperty('background-color', 'red', 'important');
+        else if (percentInt > 60)
+          rpmBar.style.setProperty('background-color', 'yellow', 'important');
+        else
+          rpmBar.style.setProperty('background-color', 'green', 'important');
+      case 2:
+        currentLap.textContent = data.Time;
+    }
   }
 });
 
