@@ -9,11 +9,12 @@ import (
 	"log"
 	"math"
 	"net/http"
-	// "time"
+
+	"wills-race-dash-go/internal/tracks"
 
 	"github.com/gorilla/websocket"
-	"go.einride.tech/can/pkg/socketcan"
 	"github.com/stratoberry/go-gpsd"
+	"go.einride.tech/can/pkg/socketcan"
 )
 
 var addr = flag.String("addr", ":8080", "http service address")
@@ -57,10 +58,54 @@ type GpsData struct {
 	Type uint8
 	Lon float64
 	Lat float64
-	Time string //time.Time
+	CurrentLap string //time.Time
+	BestLap string
+	PbLap string
+	LastLap string
 }
 
-func handleGps(conn *websocket.Conn) {
+func containsCurrentCoordinates(arr []float64, coordinate float64) bool {
+  for _, v := range arr {
+    if v == coordinate {
+      return true
+    }
+  }
+  return false
+}
+
+func containsCurrentCoordinates2(min float64, max float64, current float64) bool {
+  if (min < current && current > max) {
+    return true
+  }
+  return false
+}
+
+// -- How to do this --
+// We've defined the tracks start line coordinates
+// Now we need to bring in the current GPS location, tak it and iterate to see if it's the tracks one
+func gpsPositionCheck(currentLat float64, currentLon float64) {
+  fmt.Println("My coords: ", currentLat, currentLon)
+
+  // This will only go off the actual points
+  if containsCurrentCoordinates(tracks.TestLat[:], currentLat) && containsCurrentCoordinates(tracks.TestLon[:], currentLon) {
+    fmt.Println("yay1")
+  }
+
+  // Need to create a range of min/max of the lat/lon and thats our range to fall within
+  if containsCurrentCoordinates2(tracks.TestLatMin, tracks.TestLatMax, currentLat) {
+    if containsCurrentCoordinates2(tracks.TestLonMin, tracks.TestLonMax, currentLon) {
+      fmt.Println("yay2")
+      
+      // TODO: Now we fire off a method to do:
+      // - the final time for this lap
+      // - new lap
+      // - Best/PB for this one + "last" lap
+      
+    }
+  }
+}
+
+func handleGpsLapTiming(conn *websocket.Conn) {
 	// Connect to the GPSD server
 	gps, err := gpsd.Dial("localhost:2947")
 	if err != nil {
@@ -69,14 +114,15 @@ func handleGps(conn *websocket.Conn) {
 
 	gpsData := GpsData{}
 	gpsData.Type = 2
-
+  fmt.Println("test1")
 	// Define a reporting filter
 	tpvFilter := func(r interface{}) {
 		report := r.(*gpsd.TPVReport)
-		// fmt.Println(report.Time, " | ", report.Lon, " | ", report.Lat)
-		gpsData.Lon = report.Lon
 		gpsData.Lat = report.Lat
-		gpsData.Time = fmt.Sprintf("%0.2d:%0.2d:%0.2d:%0.3d", report.Time.Hour(), report.Time.Minute(), report.Time.Second(), report.Time.Nanosecond()/1000000)
+    gpsData.Lon = report.Lon
+		gpsData.CurrentLap = fmt.Sprintf("%0.2d:%0.2d:%0.2d:%0.3d", report.Time.Hour(), report.Time.Minute(), report.Time.Second(), report.Time.Nanosecond()/1000000)
+
+    gpsPositionCheck(report.Lat, report.Lon)
 
 		jsonData, err := json.Marshal(gpsData)
 		if err != nil {
@@ -88,12 +134,13 @@ func handleGps(conn *websocket.Conn) {
 			return
 		}
 	}
-
+  fmt.Println("test2")
 	gps.AddFilter("TPV", tpvFilter)
-
+  fmt.Println("test3")
 	done := gps.Watch()
+  fmt.Println("test4")
 	<-done
-	// .. some time later ....
+  fmt.Println("test5")
 	gps.Close()
 }
 
@@ -106,8 +153,8 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
     defer conn.Close()
 
 
-		// ---------- GPS ----------
-		go handleGps(conn)
+		// ---------- Lap Timing ----------
+		go handleGpsLapTiming(conn)
 
 
 		// ---------- CANBus data ----------
@@ -163,25 +210,6 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-
-
-		// ----------------------------------------
-    // for {
-    //     // Reading message
-    //     // messageType, p, err := conn.ReadMessage()
-    //     // if err != nil {
-    //     //     log.Println("Read error: ", err)
-    //     //     return
-    //     // }
-    //     // fmt.Println("Received: ", string(p))
-
-    //     // Writing message back
-		// 		message := []byte("Test message from backend")
-		// 		if err := conn.WriteMessage(websocket.TextMessage, message); err != nil {
-		// 			log.Println("Write error:", err)
-		// 			return
-		// 	}
-    // }
 }
 
 func main() {
