@@ -9,6 +9,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"time"
 
 	"wills-race-dash-go/internal/tracks"
 
@@ -58,10 +59,11 @@ type GpsData struct {
 	Type uint8
 	Lon float64
 	Lat float64
-	CurrentLap string //time.Time
-	BestLap string
-	PbLap string
-	LastLap string
+  CurrentLapStartTime time.Time
+	CurrentLapTime int32
+	BestLapTime int32
+	PbLapTime int32
+	PreviousLapTime int32
 }
 
 func containsCurrentCoordinates(arr []float64, coordinate float64) bool {
@@ -83,24 +85,28 @@ func containsCurrentCoordinates2(min float64, max float64, current float64) bool
 // -- How to do this --
 // We've defined the tracks start line coordinates
 // Now we need to bring in the current GPS location, tak it and iterate to see if it's the tracks one
-func gpsPositionCheck(currentLat float64, currentLon float64) {
-  fmt.Println("My coords: ", currentLat, currentLon)
-
+func (gpsData *GpsData) startFinishLineDetection(currentLat float64, currentLon float64, currentTime time.Time) {
+  // Current lap time
+  timeDiff := currentTime.Sub(gpsData.CurrentLapStartTime)
+  gpsData.CurrentLapTime = int32(timeDiff.Milliseconds())
+  
   // This will only go off the actual points
-  if containsCurrentCoordinates(tracks.TestLat[:], currentLat) && containsCurrentCoordinates(tracks.TestLon[:], currentLon) {
-    fmt.Println("yay1")
-  }
-
+  // if containsCurrentCoordinates(tracks.TestLat[:], currentLat) && containsCurrentCoordinates(tracks.TestLon[:], currentLon) {
+  //   fmt.Println("yay1")
+  // }
   // Need to create a range of min/max of the lat/lon and thats our range to fall within
   if containsCurrentCoordinates2(tracks.TestLatMin, tracks.TestLatMax, currentLat) {
     if containsCurrentCoordinates2(tracks.TestLonMin, tracks.TestLonMax, currentLon) {
-      fmt.Println("yay2")
+      if gpsData.CurrentLapTime < gpsData.BestLapTime || gpsData.BestLapTime == 0 {
+        gpsData.BestLapTime = gpsData.CurrentLapTime
+      }
+      if gpsData.CurrentLapTime < gpsData.PbLapTime || gpsData.PbLapTime == 0 {
+        gpsData.PbLapTime = gpsData.CurrentLapTime
+      }
+      gpsData.PreviousLapTime = gpsData.CurrentLapTime
       
-      // TODO: Now we fire off a method to do:
-      // - the final time for this lap
-      // - new lap
-      // - Best/PB for this one + "last" lap
-      
+      // Start the next lap
+      gpsData.CurrentLapStartTime = currentTime
     }
   }
 }
@@ -114,15 +120,30 @@ func handleGpsLapTiming(conn *websocket.Conn) {
 
 	gpsData := GpsData{}
 	gpsData.Type = 2
-  fmt.Println("test1")
+  // TODO: maybe preset the times with System.Time first off?
+  //gpsData.CurrentLaptStartTime = 
+  
+  //time.Now().Format("15:04:05.000000000")
+  //gpsData.CurrentLapStartTime = time.Now().Format("15:04:05.000000000")
+  gpsData.CurrentLapStartTime = time.Now().Round(100 * time.Millisecond)
+  
 	// Define a reporting filter
 	tpvFilter := func(r interface{}) {
 		report := r.(*gpsd.TPVReport)
 		gpsData.Lat = report.Lat
     gpsData.Lon = report.Lon
-		gpsData.CurrentLap = fmt.Sprintf("%0.2d:%0.2d:%0.2d:%0.3d", report.Time.Hour(), report.Time.Minute(), report.Time.Second(), report.Time.Nanosecond()/1000000)
+    
+    // ----- Convert report.Time from UTC to Australia/Sydney -----
+    location, err := time.LoadLocation("Australia/Sydney")
+    if err != nil {
+      fmt.Println("Error loading location:", err)
+      return
+    }
+    convertedTime := report.Time.In(location)
 
-    gpsPositionCheck(report.Lat, report.Lon)
+    // Main bulk of it for GPS/Lap Timing
+    gpsData.startFinishLineDetection(report.Lat, report.Lon, convertedTime)
+
 
 		jsonData, err := json.Marshal(gpsData)
 		if err != nil {
@@ -134,13 +155,10 @@ func handleGpsLapTiming(conn *websocket.Conn) {
 			return
 		}
 	}
-  fmt.Println("test2")
+  
 	gps.AddFilter("TPV", tpvFilter)
-  fmt.Println("test3")
 	done := gps.Watch()
-  fmt.Println("test4")
 	<-done
-  fmt.Println("test5")
 	gps.Close()
 }
 
