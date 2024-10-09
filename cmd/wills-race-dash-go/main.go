@@ -66,12 +66,13 @@ type GpsData struct {
 
 type LapStats struct {
   Type int8
+  LapCounter int8
 	BestLapTime int32
 	PbLapTime int32
 	PreviousLapTime int32
 }
 
-var lapStats = LapStats{Type: 3}
+var lapStats = LapStats{Type: 3, LapCounter: 1}
 // **********************************************************************************************************
 
 func containsCurrentCoordinates(arr []float64, coordinate float64) bool {
@@ -114,6 +115,7 @@ func (gpsData *GpsData) startFinishLineDetection(currentLat float64, currentLon 
       
       // Start the next lap
       gpsData.CurrentLapStartTime = currentTime
+      lapStats.LapCounter++;
 
       // Send up to client
       jsonData, err := json.Marshal(lapStats)
