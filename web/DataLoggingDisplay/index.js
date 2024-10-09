@@ -1,5 +1,15 @@
 const socket = new WebSocket('ws://' + document.location.host + '/ws');
 
+socket.onopen = function(e) {
+  console.log('Connected to WebSocket server.');
+};
+socket.onclose = function (e) {
+  console.log('Connection closed');
+};
+window.addEventListener("beforeunload", function () {
+  socket.close();
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   var rpmBar = document.getElementById('rpmbar');
   var rpmNum = document.getElementById('rpmNum');

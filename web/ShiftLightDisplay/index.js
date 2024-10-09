@@ -1,5 +1,15 @@
 const socket = new WebSocket('ws://' + document.location.host + '/ws');
 
+socket.onopen = function(e) {
+  console.log('Connected to WebSocket server.');
+};
+socket.onclose = function (e) {
+  console.log('Connection closed');
+};
+window.addEventListener("beforeunload", function () {
+  socket.close();
+});
+
 let shiftLightRange1 = 0;
 let shiftLightRange2 = 0;
 let shiftLightRange3 = 0;
@@ -68,8 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
   socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
 
-    switch(data.Type) {
-      case 1:
+    // switch(data.Type) {
+    //   case 1:
         const rpm = data.Rpm;
         if (rpm < shiftLightRange1) { shiftLight1.style.setProperty('background-color', ''); }
         if (rpm >= shiftLightRange1) { shiftLight1.style.setProperty('background-color', 'blue'); }
@@ -108,11 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
         lambdaRatio.textContent = data.LambdaRatio;
         oilTemp.textContent = data.OilTemp;
         oilPressure.textContent = data.OilPressure;
-      case 2:
-        console.log('--------------------------------------')
-        console.log(data.Time)
+      // case 2:
+      //   console.log('--------------------------------------')
+      //   console.log(data.Time)
       
-    }
+    // }
   };
 
   // requestAnimationFrame(animateRpmBar);

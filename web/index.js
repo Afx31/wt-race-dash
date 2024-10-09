@@ -1,8 +1,14 @@
 const socket = new WebSocket('ws://' + document.location.host + '/ws');
 
-socket.onopen = function(event) {
+socket.onopen = function(e) {
   console.log('Connected to WebSocket server.');
 };
+socket.onclose = function (e) {
+  console.log('Connection closed');
+};
+window.addEventListener("beforeunload", function () {
+  socket.close();
+});
 
 socket.onmessage = function(event) {
   const data = JSON.parse(event.data);
