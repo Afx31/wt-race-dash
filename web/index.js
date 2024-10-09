@@ -1,10 +1,13 @@
 const socket = new WebSocket('ws://' + document.location.host + '/ws');
 
-socket.onopen = function(e) {
+socket.onopen = function(event) {
   console.log('Connected to WebSocket server.');
 };
-socket.onclose = function (e) {
-  console.log('Connection closed');
+socket.onclose = function (event) {
+  console.log('Connection closed: ', event);
+};
+socket.onerror = function(err) {
+  console.log('WebSocket error:', err);
 };
 window.addEventListener("beforeunload", function () {
   socket.close();
@@ -24,8 +27,6 @@ socket.onmessage = function(event) {
   var tps = document.getElementById('tps');
   var map = document.getElementById('map');
   var lambdaRatio = document.getElementById('lambdaRatio');
-  // var inj = document.getElementById('inj');
-  // var ign = document.getElementById('ign');
   var oilTemp = document.getElementById('oilTemp');
   var oilPressure = document.getElementById('oilPressure');
   
@@ -48,16 +49,6 @@ socket.onmessage = function(event) {
   tps.textContent = data.Tps;
   map.textContent = data.Map;
   lambdaRatio.textContent = data.LambdaRatio;
-  // inj.textContent = data.inj;
-  // ign.textContent = data.ign;
   oilTemp.textContent = data.OilTemp;
   oilPressure.textContent = data.OilPressure;
-};
-
-socket.onerror = function(error) {
-  console.log('WebSocket error:', error);
-};
-
-socket.onclose = function(event) {
-  console.log('WebSocket connection closed:', event);
 };

@@ -161,7 +161,6 @@ func handleGpsLapTiming() {
 		if err != nil {
 			log.Fatal("Json Marshall error (GPS): ", err)
 		}
-
     // Send up to client
 		if err := wsConn.WriteMessage(websocket.TextMessage, jsonData); err != nil {
 			if websocket.IsUnexpectedCloseError(err) {
@@ -198,8 +197,7 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
   defer canConn.Close()
   canRecv:= socketcan.NewReceiver(canConn)
 
-  canData := CanData{}
-  canData.Type = 1
+  canData := CanData{Type: 1}
 
   for canRecv.Receive() {
     frame := canRecv.Frame()
@@ -240,7 +238,6 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
       log.Println("Json Marshal error (CAN): ", err)
       return
     }
-
     if err := wsConn.WriteMessage(websocket.TextMessage, jsonData); err != nil {
       fmt.Println("Write error (CAN): ", err)
       return
@@ -250,7 +247,7 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
 
 
 func main() {
-    fmt.Println("--- Server running ---")
+    fmt.Println("---------- Server running ----------")
 
     // Serve all static files from the 'web' directory
     fs := http.FileServer(http.Dir("../../web"))

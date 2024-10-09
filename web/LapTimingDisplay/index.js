@@ -1,19 +1,19 @@
 const socket = new WebSocket('ws://' + document.location.host + '/ws');
 
-socket.onopen = function(e) {
+socket.onopen = function(event) {
   console.log('Connected to WebSocket server.');
 };
-socket.onclose = function (e) {
-  console.log('Connection closed');
+socket.onclose = function (event) {
+  console.log('Connection closed: ', event);
+};
+socket.onerror = function(err) {
+  console.log('WebSocket error:', err);
 };
 window.addEventListener("beforeunload", function () {
   socket.close();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-  // if (data.changeDisplay === 1)
-  //   window.location.href = 'http://localhost:3000/DataLoggingDisplay';
-  
   var rpmBar = document.getElementById('rpmbar');
   var rpmNum = document.getElementById('rpmNum');
   var speed = document.getElementById('speed');
@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
         rpmBar.style.setProperty('max-width', '1920px', 'important');
         var rpmbarPercentage = (data.Rpm / 9000) * 100;
 
-        // Assign data to UI controls
         rpmBar.style.width = `${rpmbarPercentage}%`;
         rpmNum.textContent = data.Rpm;
         speed.textContent = data.Speed;
@@ -75,14 +74,4 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
     }
   }
-});
-
-socket.on('LapTiming', (data) => {
-  var currentMinutes = Math.floor((data % 3600000) / 60000);
-  var currentSeconds = (Math.floor((data % 60000) / 1000)).toString().padStart(2, '0');
-  var currentMilliseconds = (data % 1000).toString().padStart(3, '0');
-  
-  var currentLap = document.getElementById('currentLap');
-
-  currentLap.textContent = `${currentMinutes}:${currentSeconds}.${currentMilliseconds}`;
 });

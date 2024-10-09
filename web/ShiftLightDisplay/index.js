@@ -1,10 +1,13 @@
 const socket = new WebSocket('ws://' + document.location.host + '/ws');
 
-socket.onopen = function(e) {
+socket.onopen = function(event) {
   console.log('Connected to WebSocket server.');
 };
-socket.onclose = function (e) {
-  console.log('Connection closed');
+socket.onclose = function (event) {
+  console.log('Connection closed: ', event);
+};
+socket.onerror = function(err) {
+  console.log('WebSocket error:', err);
 };
 window.addEventListener("beforeunload", function () {
   socket.close();
@@ -77,52 +80,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
+    const rpm = data.Rpm;
 
-    // switch(data.Type) {
-    //   case 1:
-        const rpm = data.Rpm;
-        if (rpm < shiftLightRange1) { shiftLight1.style.setProperty('background-color', ''); }
-        if (rpm >= shiftLightRange1) { shiftLight1.style.setProperty('background-color', 'blue'); }
-        
-        if (rpm < shiftLightRange2) { shiftLight2.style.setProperty('background-color', ''); }
-        if (rpm >= shiftLightRange2) { shiftLight2.style.setProperty('background-color', 'blue'); }
+    if (rpm < shiftLightRange1) { shiftLight1.style.setProperty('background-color', ''); }
+    if (rpm >= shiftLightRange1) { shiftLight1.style.setProperty('background-color', 'blue'); }
+    
+    if (rpm < shiftLightRange2) { shiftLight2.style.setProperty('background-color', ''); }
+    if (rpm >= shiftLightRange2) { shiftLight2.style.setProperty('background-color', 'blue'); }
 
-        if (rpm < shiftLightRange3) {shiftLight3.style.setProperty('background-color', ''); }
-        if (rpm >= shiftLightRange3) { shiftLight3.style.setProperty('background-color', 'green'); }
+    if (rpm < shiftLightRange3) {shiftLight3.style.setProperty('background-color', ''); }
+    if (rpm >= shiftLightRange3) { shiftLight3.style.setProperty('background-color', 'green'); }
 
-        if (rpm < shiftLightRange4) { shiftLight4.style.setProperty('background-color', ''); }
-        if (rpm >= shiftLightRange4) { shiftLight4.style.setProperty('background-color', 'green'); }
+    if (rpm < shiftLightRange4) { shiftLight4.style.setProperty('background-color', ''); }
+    if (rpm >= shiftLightRange4) { shiftLight4.style.setProperty('background-color', 'green'); }
 
-        if (rpm < shiftLightRange5) { shiftLight5.style.setProperty('background-color', ''); }
-        if (rpm >= shiftLightRange5) { shiftLight5.style.setProperty('background-color', 'yellow'); }
+    if (rpm < shiftLightRange5) { shiftLight5.style.setProperty('background-color', ''); }
+    if (rpm >= shiftLightRange5) { shiftLight5.style.setProperty('background-color', 'yellow'); }
 
-        if (rpm < shiftLightRange6) { shiftLight6.style.setProperty('background-color', ''); }
-        if (rpm >= shiftLightRange6) { shiftLight6.style.setProperty('background-color', 'yellow'); }
+    if (rpm < shiftLightRange6) { shiftLight6.style.setProperty('background-color', ''); }
+    if (rpm >= shiftLightRange6) { shiftLight6.style.setProperty('background-color', 'yellow'); }
 
-        if (rpm < shiftLightRange7) { shiftLight7.style.setProperty('background-color', ''); }
-        if (rpm >= shiftLightRange7) { shiftLight7.style.setProperty('background-color', 'red'); }
+    if (rpm < shiftLightRange7) { shiftLight7.style.setProperty('background-color', ''); }
+    if (rpm >= shiftLightRange7) { shiftLight7.style.setProperty('background-color', 'red'); }
 
-        // Assign data to UI controls
-        rpmBar.style.width = ((rpm / 9000) * 100) + '%';
-        // currentRpm = rpm;
+    // Assign data to UI controls
+    rpmBar.style.width = ((rpm / 9000) * 100) + '%';
+    // currentRpm = rpm;
 
-        tpsBar.style.height = data.Tps + '%';
-        rpmNum.textContent = rpm;
-        speed.textContent = data.Speed;
-        gear.textContent = data.Gear;
-        voltage.textContent = data.Voltage;
-        iat.textContent = data.Iat;
-        ect.textContent = data.Ect;
-        // tps.textContent = data.Tps;
-        // map.textContent = data.Map;
-        lambdaRatio.textContent = data.LambdaRatio;
-        oilTemp.textContent = data.OilTemp;
-        oilPressure.textContent = data.OilPressure;
-      // case 2:
-      //   console.log('--------------------------------------')
-      //   console.log(data.Time)
-      
-    // }
+    tpsBar.style.height = data.Tps + '%';
+    rpmNum.textContent = rpm;
+    speed.textContent = data.Speed;
+    gear.textContent = data.Gear;
+    voltage.textContent = data.Voltage;
+    iat.textContent = data.Iat;
+    ect.textContent = data.Ect;
+    // tps.textContent = data.Tps;
+    // map.textContent = data.Map;
+    lambdaRatio.textContent = data.LambdaRatio;
+    oilTemp.textContent = data.OilTemp;
+    oilPressure.textContent = data.OilPressure;
   };
 
   // requestAnimationFrame(animateRpmBar);
