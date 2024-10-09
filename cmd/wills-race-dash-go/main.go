@@ -56,11 +56,9 @@ type CanData struct {
 	OilPressure uint16
 }
 
-type GpsData struct {
+type CurrentLapData struct {
 	Type int8
-	Lon float64
-	Lat float64
-  CurrentLapStartTime time.Time
+  LapStartTime time.Time
 	CurrentLapTime int32
 }
 
@@ -75,6 +73,7 @@ type LapStats struct {
 var lapStats = LapStats{Type: 3, LapCounter: 1}
 // **********************************************************************************************************
 
+// Testing
 func containsCurrentCoordinates(arr []float64, coordinate float64) bool {
   for _, v := range arr {
     if v == coordinate {
@@ -94,27 +93,27 @@ func containsCurrentCoordinates2(min float64, max float64, current float64) bool
 // -- How to do this --
 // We've defined the tracks start line coordinates
 // Now we need to bring in the current GPS location, tak it and iterate to see if it's the tracks one
-func (gpsData *GpsData) startFinishLineDetection(currentLat float64, currentLon float64, currentTime time.Time) {
-  timeDiff := currentTime.Sub(gpsData.CurrentLapStartTime)
-  gpsData.CurrentLapTime = int32(timeDiff.Milliseconds())
+func (currentLapData *CurrentLapData) startFinishLineDetection(currentLat float64, currentLon float64, currentTime time.Time) {
+  timeDiff := currentTime.Sub(currentLapData.LapStartTime)
+  currentLapData.CurrentLapTime = int32(timeDiff.Milliseconds())
 
-  // This will only go off the actual points
+  // Testing: This will only go off the actual points
   // if containsCurrentCoordinates(tracks.TestLat[:], currentLat) && containsCurrentCoordinates(tracks.TestLon[:], currentLon) {
   //   fmt.Println("yay1")
   // }
   
   if containsCurrentCoordinates2(tracks.TestLatMin, tracks.TestLatMax, currentLat) {
     if containsCurrentCoordinates2(tracks.TestLonMin, tracks.TestLonMax, currentLon) {
-      if gpsData.CurrentLapTime < lapStats.BestLapTime || lapStats.BestLapTime == 0 {
-        lapStats.BestLapTime = gpsData.CurrentLapTime
+      if currentLapData.CurrentLapTime < lapStats.BestLapTime || lapStats.BestLapTime == 0 {
+        lapStats.BestLapTime = currentLapData.CurrentLapTime
       }
-      if gpsData.CurrentLapTime < lapStats.PbLapTime || lapStats.PbLapTime == 0 {
-        lapStats.PbLapTime = gpsData.CurrentLapTime
+      if currentLapData.CurrentLapTime < lapStats.PbLapTime || lapStats.PbLapTime == 0 {
+        lapStats.PbLapTime = currentLapData.CurrentLapTime
       }
-      lapStats.PreviousLapTime = gpsData.CurrentLapTime
+      lapStats.PreviousLapTime = currentLapData.CurrentLapTime
       
       // Start the next lap
-      gpsData.CurrentLapStartTime = currentTime
+      currentLapData.LapStartTime = currentTime
       lapStats.LapCounter++;
 
       // Send up to client
@@ -134,19 +133,16 @@ func handleGpsLapTiming() {
 	// Connect to the GPSD server
 	gps, err := gpsd.Dial("localhost:2947")
 	if err != nil {
-		log.Fatal("Failed to connect to GPSD: %v", err)
+		log.Fatal("Failed to connect to GPSD: ", err)
 	}
 
-	gpsData := GpsData{}
-	gpsData.Type = 2
-  gpsData.CurrentLapStartTime = time.Now().Round(100 * time.Millisecond)
-  //gpsData.CurrentLapStartTime = time.Now().Format("15:04:05.000000000")
+	currentLapData := CurrentLapData{Type: 2}
+  currentLapData.LapStartTime = time.Now().Round(100 * time.Millisecond)
+  //currentLapData.CurrentLapStartTime = time.Now().Format("15:04:05.000000000")
     
 	// Define a reporting filter
 	tpvFilter := func(r interface{}) {
 		report := r.(*gpsd.TPVReport)
-		gpsData.Lat = report.Lat
-    gpsData.Lon = report.Lon
     
     // ----- Convert report.Time from UTC to Australia/Sydney -----
     location, err := time.LoadLocation("Australia/Sydney")
@@ -157,9 +153,9 @@ func handleGpsLapTiming() {
     convertedTime := report.Time.In(location)
 
     // Main bulk of it for GPS/Lap Timing
-    gpsData.startFinishLineDetection(report.Lat, report.Lon, convertedTime)
+    currentLapData.startFinishLineDetection(report.Lat, report.Lon, convertedTime)
 
-		jsonData, err := json.Marshal(gpsData)
+		jsonData, err := json.Marshal(currentLapData)
 		if err != nil {
 			log.Fatal("Json Marshall error (GPS): ", err)
 		}
