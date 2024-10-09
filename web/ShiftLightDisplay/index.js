@@ -1,5 +1,18 @@
 const socket = new WebSocket('ws://' + document.location.host + '/ws');
 
+socket.onopen = function(event) {
+  console.log('Connected to WebSocket server.');
+};
+socket.onclose = function (event) {
+  console.log('Connection closed: ', event);
+};
+socket.onerror = function(err) {
+  console.log('WebSocket error:', err);
+};
+window.addEventListener("beforeunload", function () {
+  socket.close();
+});
+
 let shiftLightRange1 = 0;
 let shiftLightRange2 = 0;
 let shiftLightRange3 = 0;
@@ -68,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
   socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
     const rpm = data.Rpm;
+
     if (rpm < shiftLightRange1) { shiftLight1.style.setProperty('background-color', ''); }
     if (rpm >= shiftLightRange1) { shiftLight1.style.setProperty('background-color', 'blue'); }
     
