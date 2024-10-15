@@ -237,7 +237,24 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
       fmt.Println("Write error (CAN): ", err)
       return
     }
-  }
+  defer wsConn.conn.Close()
+
+  var wg sync.WaitGroup
+  wg.Add(2)
+
+  // ---------- Handle CAN data ----------
+  go func() {
+    defer wg.Done()
+    wsConn.handleCanBusData()
+  }()
+
+  // ---------- Lap Timing ----------
+  go func() {
+    defer wg.Done()
+    wsConn.handleGpsLapTiming()
+  }()
+
+  wg.Wait()
 }
 
 
