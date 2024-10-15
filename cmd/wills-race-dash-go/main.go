@@ -211,6 +211,7 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
         canData.Ect = binary.BigEndian.Uint16(frame.Data[2:4])
       case 662, 1634:
         canData.Tps = binary.BigEndian.Uint16(frame.Data[0:2])
+				if canData.Tps == 65535 { canData.Tps = 0	}
         canData.Map = binary.BigEndian.Uint16(frame.Data[2:4]) / 10
       case 664, 1636:
         canData.LambdaRatio = 32768 / binary.BigEndian.Uint16(frame.Data[0:2])
