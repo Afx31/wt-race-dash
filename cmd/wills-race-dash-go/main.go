@@ -201,25 +201,20 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
     frame := canRecv.Frame()
     
     switch frame.ID {
-      case 660:
-      // case 1632:
+      case 660, 1632:
         canData.Rpm = binary.BigEndian.Uint16(frame.Data[0:2])
         canData.Speed = binary.BigEndian.Uint16(frame.Data[2:4])
         canData.Gear = frame.Data[4]
         canData.Voltage = frame.Data[5] / 10
-      case 661:
-      // case 1633:
+      case 661, 1633:
         canData.Iat = binary.BigEndian.Uint16(frame.Data[0:2])
         canData.Ect = binary.BigEndian.Uint16(frame.Data[2:4])
-      case 662:
-      // case 1634:
+      case 662, 1634:
         canData.Tps = binary.BigEndian.Uint16(frame.Data[0:2])
         canData.Map = binary.BigEndian.Uint16(frame.Data[2:4]) / 10
-      case 664:
-      // case 1636:
+      case 664, 1636:
         canData.LambdaRatio = 32768 / binary.BigEndian.Uint16(frame.Data[0:2])
-      case 667:
-      // case 1639:
+      case 667, 1639:
         // Oil Temp
         oilTempResistance := binary.BigEndian.Uint16(frame.Data[0:2])
         kelvinTemp := 1 / (A + B * math.Log(float64(oilTempResistance)) + C * math.Pow(math.Log(float64(oilTempResistance)), 3))
