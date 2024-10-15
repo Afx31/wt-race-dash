@@ -133,7 +133,8 @@ func handleGpsLapTiming() {
 	// Connect to the GPSD server
 	gps, err := gpsd.Dial("localhost:2947")
 	if err != nil {
-		log.Fatal("Failed to connect to GPSD: ", err)
+		fmt.Println("Failed to connect to GPSD: ", err)
+		return
 	}
 
 	currentLapData := CurrentLapData{Type: 2}
