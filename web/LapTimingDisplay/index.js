@@ -17,10 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
   var rpmBar = document.getElementById('rpmbar');
   var rpmNum = document.getElementById('rpmNum');
   var speed = document.getElementById('speed');
+  var gear = document.getElementById('gear');
   var voltage = document.getElementById('voltage');
   var iat = document.getElementById('iat');
   var ect = document.getElementById('ect');
-  var tps = document.getElementById('tps');
+  var tpsBar = document.getElementById('tpsbar');
+  var lambdaRatio = document.getElementById('lambdaRatio');
   var oilTemp = document.getElementById('oilTemp');
   var oilPressure = document.getElementById('oilPressure');
 
@@ -38,13 +40,15 @@ document.addEventListener('DOMContentLoaded', () => {
         rpmBar.style.setProperty('max-width', '1920px', 'important');
         var rpmbarPercentage = (data.Rpm / 9000) * 100;
 
+        tpsBar.style.height = data.Tps + '%';
         rpmBar.style.width = `${rpmbarPercentage}%`;
         rpmNum.textContent = data.Rpm;
         speed.textContent = data.Speed;
+        gear.textContent = data.Gear;
         voltage.textContent = (data.Voltage / 10).toFixed(1);
         iat.textContent = data.Iat;
         ect.textContent = data.Ect;
-        tps.textContent = data.Tps;
+        lambdaRatio.textContent = data.LambdaRatio;
         oilTemp.textContent = data.OilTemp;
         oilPressure.textContent = data.OilPressure;
         break;

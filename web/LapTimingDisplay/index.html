@@ -52,19 +52,19 @@
           <p id="ect" class="data-reading">-</p>
         </div>
         <div class="middle-info-panel">
-          <p class="data-title">TPS:</p>
+          <p class="data-title">Speed:</p>
           <hr />
-          <p id="tps" class="data-reading">-</p>
-        </div>
-        <div class="middle-info-panel">
-          <p class="data-title">Oil Temp:</p>
-          <hr />
-          <p id="oilTemp" class="data-reading">-</p>
+          <p id="speed" class="data-reading">-</p>
         </div>
         <div class="middle-info-panel">
           <p class="data-title">RPM:</p>
           <hr />
           <p id="rpmNum" class="data-reading">-</p>
+        </div>
+        <div class="middle-info-panel">
+          <p class="data-title">Oil Temp:</p>
+          <hr />
+          <p id="oilTemp" class="data-reading">-</p>
         </div>
 
         <!-- Bottom Row -->
@@ -73,7 +73,11 @@
           <hr />
           <p id="iat" class="data-reading">-</p>
         </div>
-        
+        <div class="middle-info-panel">
+          <p class="data-title">Air/Fuel:</p>
+          <hr />
+          <p id="lambdaRatio" class="data-reading">-</p>
+        </div>
         <div class="middle-info-panel">
           <p class="data-title">Voltage:</p>
           <hr />
@@ -84,33 +88,54 @@
           <hr />
           <p id="oilPressure" class="data-reading">-</p>
         </div>
-        <div class="middle-info-panel">
-          <p class="data-title">Speed:</p>
-          <hr />
-          <p id="speed" class="data-reading">-</p>
-        </div>
       </div>
 
       <div class="bottom-panel">
-        <div class="bottom-info-panel">
-          <p class="data-title">Current Lap:</p>
-          <hr />
-          <p id="currentLapTime" class="data-reading">0.00.000</p>
+        <div class="bottom-panel-section-left">
+          <div class="bottom-info-panel">
+            <p class="data-title">Current Lap:</p>
+            <hr />
+            <p id="currentLapTime" class="data-reading">0.00.000</p>
+          </div>
+          <div class="bottom-info-panel">
+            <p class="data-title">Previous Lap:</p>
+            <hr />
+            <p id="previousLapTime" class="data-reading">0.00.000</p>
+          </div>
         </div>
-        <div class="bottom-info-panel">
-          <p class="data-title">Best Lap:</p>
-          <hr />
-          <p id="bestLapTime" class="data-reading">0.00.000</p>
+        
+        <div class="bottom-panel-section-middle">
+          <div class="test-grid-template">
+            <div class="info-panel-middle-bottom-left">
+              <div class="data-title">Gear:</div>
+              <hr />
+              <p id="gear" class="data-reading-gear">-</p>
+            </div>
+            <div class="info-panel-middle-bottom-right">
+              <p class="data-title-brake-tps">Brake | TPS</p>
+              <div class="bar-section-container">
+                <div class="brake-bar-container">
+                  <div id="brakebar" class="brake-bar"></div>
+                </div>
+                <div class="tps-bar-container">
+                  <div id="tpsbar" class="tps-bar"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="bottom-info-panel">
-          <p class="data-title">Previous Lap:</p>
-          <hr />
-          <p id="previousLapTime" class="data-reading">0.00.000</p>
-        </div>
-        <div class="bottom-info-panel">
-          <p class="data-title">PB Lap:</p>
-          <hr />
-          <p id="pbLapTime" class="data-reading">0.00.000</p>
+
+        <div class="bottom-panel-section-right">
+          <div class="bottom-info-panel">
+            <p class="data-title">Best Lap:</p>
+            <hr />
+            <p id="bestLapTime" class="data-reading">0.00.000</p>
+          </div>
+          <div class="bottom-info-panel">
+            <p class="data-title">PB Lap:</p>
+            <hr />
+            <p id="pbLapTime" class="data-reading">0.00.000</p>
+          </div>
         </div>
       </div>
     </div>
