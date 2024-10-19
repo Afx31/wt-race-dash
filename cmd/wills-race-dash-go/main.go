@@ -56,7 +56,7 @@ type LapStats struct {
 
 var (
   addr = flag.String("addr", ":8080", "http service address")
-  configCanDevice = "vcan0"
+  configCanDevice = "can0"
   configStopDataloggingId = uint32(105)
   upgrader = websocket.Upgrader{
     ReadBufferSize:  1024,
@@ -75,15 +75,11 @@ var (
 	originalHigh float64 = 5 //4.5
 	desiredLow float64 = -100 //0
 	desiredHigh float64 = 1100 //1000
-)
 
-
-var (
+	// Testing
 	stopChanDatalogging = make(chan struct{})   // Channel to signal the goroutine to stop
-	wg       sync.WaitGroup  // WaitGroup to ensure clean shutdown of goroutine
+	wg sync.WaitGroup  // WaitGroup to ensure clean shutdown of goroutine
 )
-
-
 // **********************************************************************************************************
 
 func containsCurrentCoordinates(min float64, max float64, current float64) bool {
@@ -140,7 +136,7 @@ func (wsConn *MySocket) handleGpsLapTiming() {
     // Testing
     //fmt.Println(report.Lat, ", ", report.Lon)
 
-    if containsCurrentCoordinates(tracks.TestLatMin, tracks.TestLatMax, report.Lat) && containsCurrentCoordinates(tracks.TestLonMin, tracks.TestLonMax, report.Lon) {
+    if containsCurrentCoordinates(tracks.MorganParkLatMin, tracks.MorganParkLatMax, report.Lat) && containsCurrentCoordinates(tracks.MorganParkLonMin, tracks.MorganParkLonMax, report.Lon) {
 			// Do lap stats
       if (currentLapData.CurrentLapTime < lapStats.BestLapTime) || lapStats.BestLapTime == 0 {
         lapStats.BestLapTime = currentLapData.CurrentLapTime
@@ -179,6 +175,7 @@ func (wsConn *MySocket) handleGpsLapTiming() {
 	<-done
 	gps.Close()
 }
+
 
 func (wsConn *MySocket) handleCanBusData() {
   // ---------- CANBus data ----------
