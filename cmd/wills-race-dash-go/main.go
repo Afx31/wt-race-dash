@@ -48,7 +48,7 @@ type CurrentLapData struct {
 
 type LapStats struct {
   Type int8
-  LapCounter int8
+  LapCount int8
 	BestLapTime int32
 	PbLapTime int32
 	PreviousLapTime int32
@@ -86,18 +86,11 @@ var (
 
 // **********************************************************************************************************
 
-// Testing
-func containsCurrentCoordinates(arr []float64, coordinate float64) bool {
-  for _, v := range arr {
-    if v == coordinate {
-      return true
-    }
+func containsCurrentCoordinates(min float64, max float64, current float64) bool {
+  if (min <= current && current >= max) {
+    return true
   }
-  return false
-}
-
-func containsCurrentCoordinates2(min float64, max float64, current float64) bool {
-  if (min < current && current > max) {
+  if (current >= min && current <= max) {
     return true
   }
   return false
@@ -109,13 +102,9 @@ func (wsConn *MySocket) writeToClient(writeType int, data []byte) {
   defer wsConn.mutex.Unlock()
 
   err := wsConn.conn.WriteMessage(websocket.TextMessage, data)
-      if err != nil {
-        log.Fatal("Json Marshall error (Lap Stats)")
-      }
-      if err := wsConn.WriteMessage(websocket.TextMessage, jsonData); err != nil {
-        fmt.Println("Write error (Lap Stats): ", err)
-      }
-    }
+  if err != nil {
+    fmt.Println("Write error: ", writeType, err)
+    return
   }
 }
 
@@ -130,7 +119,7 @@ func (wsConn *MySocket) handleGpsLapTiming() {
 	currentLapData := CurrentLapData{Type: 2}
   currentLapData.LapStartTime = time.Now().Round(100 * time.Millisecond)
   //currentLapData.CurrentLapStartTime = time.Now().Format("15:04:05.000000000")
-    
+
 	// Define a reporting filter
 	tpvFilter := func(r interface{}) {
 		report := r.(*gpsd.TPVReport)
@@ -141,10 +130,42 @@ func (wsConn *MySocket) handleGpsLapTiming() {
       fmt.Println("Error loading location:", err)
       return
     }
-    convertedTime := report.Time.In(location)
+    convertedCurrentTime := report.Time.In(location)
 
-    // Main bulk of it for GPS/Lap Timing
-    currentLapData.startFinishLineDetection(report.Lat, report.Lon, convertedTime)
+	
+    // ---------- GPS/Lap Timing ----------
+    timeDiff := convertedCurrentTime.Sub(currentLapData.LapStartTime)
+    currentLapData.CurrentLapTime = int32(timeDiff.Milliseconds())
+
+    // Testing
+    //fmt.Println(report.Lat, ", ", report.Lon)
+
+    if containsCurrentCoordinates(tracks.TestLatMin, tracks.TestLatMax, report.Lat) && containsCurrentCoordinates(tracks.TestLonMin, tracks.TestLonMax, report.Lon) {
+			// Do lap stats
+      if (currentLapData.CurrentLapTime < lapStats.BestLapTime) || lapStats.BestLapTime == 0 {
+        lapStats.BestLapTime = currentLapData.CurrentLapTime
+      }
+      if (currentLapData.CurrentLapTime < lapStats.PbLapTime) || lapStats.PbLapTime == 0 {
+        lapStats.PbLapTime = currentLapData.CurrentLapTime
+      }
+      lapStats.PreviousLapTime = currentLapData.CurrentLapTime
+      
+      // Start the next lap
+      currentLapData.LapStartTime = convertedCurrentTime
+      lapStats.LapCount++;
+
+      // Send up to client
+      jsonData, err := json.Marshal(lapStats)
+      if err != nil {
+        log.Fatal("Json Marshall error (Lap Stats)")
+      }
+      wsConn.writeToClient(3, jsonData)
+    }
+		jsonData2, err := json.Marshal(lapStats)
+      if err != nil {
+        log.Fatal("Json Marshall error (Lap Stats)")
+      }
+      wsConn.writeToClient(3, jsonData2)
 
 		jsonData, err := json.Marshal(currentLapData)
 		if err != nil {
@@ -203,7 +224,7 @@ func (wsConn *MySocket) handleCanBusData() {
         oilTempResistance := binary.BigEndian.Uint16(frame.Data[0:2])
         kelvinTemp := 1 / (A + B * math.Log(float64(oilTempResistance)) + C * math.Pow(math.Log(float64(oilTempResistance)), 3))
         canData.OilTemp = uint16(kelvinTemp - 273.15)
-  
+
         // Oil Pressure
         oilPressureResistance := float64(binary.BigEndian.Uint16(frame.Data[2:4])) / 819.2
         kPaValue := ((float64(oilPressureResistance) - originalLow) / (originalHigh - originalLow) * (desiredHigh - desiredLow)) + desiredLow
@@ -229,7 +250,7 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
   if err != nil {
       log.Println("Error upgrading WebSocket: ", err)
       return
-    }
+  }
   defer wsConn.conn.Close()
 
   // ===============================================================  
@@ -253,18 +274,18 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
 
 
 func main() {
-    fmt.Println("---------- Server running ----------")
+  fmt.Println("---------- Server running ----------")
 
-    // Serve all static files from the 'web' directory
-    fs := http.FileServer(http.Dir("../../web"))
-    http.Handle("/", fs)
+  // Serve all static files from the 'web' directory
+  fs := http.FileServer(http.Dir("../../web"))
+  http.Handle("/", fs)
 
-    // Handle WebSocket connection
-    http.HandleFunc("/ws", handleWs)
+  // Handle WebSocket connection
+  http.HandleFunc("/ws", handleWs)
 
-		fmt.Println("Server starting at :8080")
-		err := http.ListenAndServe(*addr, nil)
-		if err != nil {
-			log.Fatal("ListenAndServe: ", err)
-		}
+  fmt.Println("Server starting at :8080")
+  err := http.ListenAndServe(*addr, nil)
+  if err != nil {
+    log.Fatal("ListenAndServe: ", err)
+  }
 }
