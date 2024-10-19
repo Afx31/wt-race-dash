@@ -82,43 +82,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const data = JSON.parse(event.data);
     const rpm = data.Rpm;
 
-    if (rpm < shiftLightRange1) { shiftLight1.style.setProperty('background-color', ''); }
-    if (rpm >= shiftLightRange1) { shiftLight1.style.setProperty('background-color', 'blue'); }
-    
-    if (rpm < shiftLightRange2) { shiftLight2.style.setProperty('background-color', ''); }
-    if (rpm >= shiftLightRange2) { shiftLight2.style.setProperty('background-color', 'blue'); }
+    if (data.Type == 1) {
+      if (rpm < shiftLightRange1) { shiftLight1.style.setProperty('background-color', ''); }
+      if (rpm >= shiftLightRange1) { shiftLight1.style.setProperty('background-color', 'blue'); }
+      
+      if (rpm < shiftLightRange2) { shiftLight2.style.setProperty('background-color', ''); }
+      if (rpm >= shiftLightRange2) { shiftLight2.style.setProperty('background-color', 'blue'); }
 
-    if (rpm < shiftLightRange3) {shiftLight3.style.setProperty('background-color', ''); }
-    if (rpm >= shiftLightRange3) { shiftLight3.style.setProperty('background-color', 'green'); }
+      if (rpm < shiftLightRange3) {shiftLight3.style.setProperty('background-color', ''); }
+      if (rpm >= shiftLightRange3) { shiftLight3.style.setProperty('background-color', 'green'); }
 
-    if (rpm < shiftLightRange4) { shiftLight4.style.setProperty('background-color', ''); }
-    if (rpm >= shiftLightRange4) { shiftLight4.style.setProperty('background-color', 'green'); }
+      if (rpm < shiftLightRange4) { shiftLight4.style.setProperty('background-color', ''); }
+      if (rpm >= shiftLightRange4) { shiftLight4.style.setProperty('background-color', 'green'); }
 
-    if (rpm < shiftLightRange5) { shiftLight5.style.setProperty('background-color', ''); }
-    if (rpm >= shiftLightRange5) { shiftLight5.style.setProperty('background-color', 'yellow'); }
+      if (rpm < shiftLightRange5) { shiftLight5.style.setProperty('background-color', ''); }
+      if (rpm >= shiftLightRange5) { shiftLight5.style.setProperty('background-color', 'yellow'); }
 
-    if (rpm < shiftLightRange6) { shiftLight6.style.setProperty('background-color', ''); }
-    if (rpm >= shiftLightRange6) { shiftLight6.style.setProperty('background-color', 'yellow'); }
+      if (rpm < shiftLightRange6) { shiftLight6.style.setProperty('background-color', ''); }
+      if (rpm >= shiftLightRange6) { shiftLight6.style.setProperty('background-color', 'yellow'); }
 
-    if (rpm < shiftLightRange7) { shiftLight7.style.setProperty('background-color', ''); }
-    if (rpm >= shiftLightRange7) { shiftLight7.style.setProperty('background-color', 'red'); }
+      if (rpm < shiftLightRange7) { shiftLight7.style.setProperty('background-color', ''); }
+      if (rpm >= shiftLightRange7) { shiftLight7.style.setProperty('background-color', 'red'); }
 
-    // Assign data to UI controls
-    rpmBar.style.width = ((rpm / 9000) * 100) + '%';
-    // currentRpm = rpm;
+      // Assign data to UI controls
+      rpmBar.style.width = ((rpm / 9000) * 100) + '%';
+      // currentRpm = rpm;
 
-    tpsBar.style.height = data.Tps + '%';
-    rpmNum.textContent = rpm;
-    speed.textContent = data.Speed;
-    gear.textContent = data.Gear;
-    voltage.textContent = data.Voltage;
-    iat.textContent = data.Iat;
-    ect.textContent = data.Ect;
-    // tps.textContent = data.Tps;
-    // map.textContent = data.Map;
-    lambdaRatio.textContent = data.LambdaRatio;
-    oilTemp.textContent = data.OilTemp;
-    oilPressure.textContent = data.OilPressure;
+      tpsBar.style.height = data.Tps + '%';
+      rpmNum.textContent = rpm;
+      speed.textContent = data.Speed;
+      gear.textContent = data.Gear;
+      voltage.textContent = data.Voltage;
+      iat.textContent = data.Iat;
+      ect.textContent = data.Ect;
+      // tps.textContent = data.Tps;
+      // map.textContent = data.Map;
+      lambdaRatio.textContent = data.LambdaRatio;
+      oilTemp.textContent = data.OilTemp;
+      oilPressure.textContent = data.OilPressure;
+    }
   };
 
   // requestAnimationFrame(animateRpmBar);

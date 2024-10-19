@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   var oilTemp = document.getElementById('oilTemp');
   var oilPressure = document.getElementById('oilPressure');
 
+  var lapCount = document.getElementById('lapCount')
   var currentLap = document.getElementById('currentLapTime');
   var previousLap = document.getElementById('previousLapTime');
   var bestLap = document.getElementById('bestLapTime');
@@ -37,11 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
     switch (data.Type) {
       case 1:
         // RPM progressive bar
-        rpmBar.style.setProperty('max-width', '1920px', 'important');
-        var rpmbarPercentage = (data.Rpm / 9000) * 100;
-
+        rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
         tpsBar.style.height = data.Tps + '%';
-        rpmBar.style.width = `${rpmbarPercentage}%`;
         rpmNum.textContent = data.Rpm;
         speed.textContent = data.Speed;
         gear.textContent = data.Gear;
@@ -72,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         var pbLapSeconds = (Math.floor((data.PbLapTime % 60000) / 1000)).toString().padStart(2, '0');
         var pbLapMilliseconds = (data.PbLapTime % 1000).toString().padStart(3, '0');
 
+        lapCount.textContent = data.LapCount;
         previousLap.textContent = `${previousLapMinutes}:${previousLapSeconds}.${previousLapMilliseconds}`;
         bestLap.textContent = `${bestLapMinutes}:${bestLapSeconds}.${bestLapMilliseconds}`;
         pbLap.textContent = `${pbLapMinutes}:${pbLapSeconds}.${pbLapMilliseconds}`;

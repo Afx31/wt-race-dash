@@ -13,9 +13,7 @@ window.addEventListener("beforeunload", function () {
   socket.close();
 });
 
-socket.onmessage = function(event) {
-  const data = JSON.parse(event.data);
-
+document.addEventListener('DOMContentLoaded', () => {
   var rpmBar = document.getElementById('rpmbar');
   var rpmNum = document.getElementById('rpmNum');
   var speed = document.getElementById('speed');
@@ -29,26 +27,32 @@ socket.onmessage = function(event) {
   var lambdaRatio = document.getElementById('lambdaRatio');
   var oilTemp = document.getElementById('oilTemp');
   var oilPressure = document.getElementById('oilPressure');
-  
-  // Assign data to UI controls
-  rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
 
-  // if (tpsBar.style.height !== data.tps + '%')
-    tpsBar.style.height = data.Tps + '%';
-
-  // if (rpmNum.textContent !== data.rpm)
-    rpmNum.textContent = data.Rpm;
+  socket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
   
-  // if (speed.textContent !== data.speed)
-    speed.textContent = data.Speed;
+    if (data.Type == 1) {
+      // Assign data to UI controls
+      rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
   
-  gear.textContent = data.Gear;
-  voltage.textContent = data.Voltage;  
-  iat.textContent = data.Iat;
-  ect.textContent = data.Ect;
-  tps.textContent = data.Tps;
-  map.textContent = data.Map;
-  lambdaRatio.textContent = data.LambdaRatio;
-  oilTemp.textContent = data.OilTemp;
-  oilPressure.textContent = data.OilPressure;
-};
+      // if (tpsBar.style.height !== data.tps + '%')
+        tpsBar.style.height = data.Tps + '%';
+  
+      // if (rpmNum.textContent !== data.rpm)
+        rpmNum.textContent = data.Rpm;
+      
+      // if (speed.textContent !== data.speed)
+        speed.textContent = data.Speed;
+      
+      gear.textContent = data.Gear;
+      voltage.textContent = data.Voltage;  
+      iat.textContent = data.Iat;
+      ect.textContent = data.Ect;
+      tps.textContent = data.Tps;
+      map.textContent = data.Map;
+      lambdaRatio.textContent = data.LambdaRatio;
+      oilTemp.textContent = data.OilTemp;
+      oilPressure.textContent = data.OilPressure;
+    }
+  };
+});

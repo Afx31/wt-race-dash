@@ -39,7 +39,6 @@ body {
   width: 0%;
   /* transition: width 0.3s ease-out, background-color 0.3s ease-out; */
 }
-/* ---------------------------------------------------------------- */
 .rpm-bar-thousands-marks {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
