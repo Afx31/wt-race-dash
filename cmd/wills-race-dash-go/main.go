@@ -9,6 +9,8 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"os/exec"
+	"sync"
 	"time"
 
 	"wills-race-dash-go/internal/tracks"
@@ -18,28 +20,10 @@ import (
 	"go.einride.tech/can/pkg/socketcan"
 )
 
-var wsConn *websocket.Conn
-var addr = flag.String("addr", ":8080", "http service address")
-var configCanDevice = "vcan0"
-var configStopDataloggingId = uint32(105)
-
-var upgrader = websocket.Upgrader{
-  ReadBufferSize:  1024,
-  WriteBufferSize: 1024,
+type MySocket struct {
+  conn *websocket.Conn
+  mutex sync.Mutex
 }
-
-// Data conversion constants
-const (
-	// Oil Temp
-	A = 0.0014222095
-	B = 0.00023729017
-	C = 9.3273998E-8
-	// Oil Pressure
-	originalLow float64 = 0 //0.5
-	originalHigh float64 = 5 //4.5
-	desiredLow float64 = -100 //0
-	desiredHigh float64 = 1100 //1000
-)
 
 type CanData struct {
 	Type uint8
@@ -70,7 +54,36 @@ type LapStats struct {
 	PreviousLapTime int32
 }
 
-var lapStats = LapStats{Type: 3, LapCounter: 1}
+var (
+  addr = flag.String("addr", ":8080", "http service address")
+  configCanDevice = "vcan0"
+  configStopDataloggingId = uint32(105)
+  upgrader = websocket.Upgrader{
+    ReadBufferSize:  1024,
+    WriteBufferSize: 1024,
+  }
+  lapStats = LapStats{Type: 3, LapCount: 1}
+  canData = CanData{Type: 1}
+
+  // --- Data conversion constants ---
+  // Oil Temp
+	A = 0.0014222095
+	B = 0.00023729017
+	C = 9.3273998E-8
+	// Oil Pressure
+	originalLow float64 = 0 //0.5
+	originalHigh float64 = 5 //4.5
+	desiredLow float64 = -100 //0
+	desiredHigh float64 = 1100 //1000
+)
+
+
+var (
+	stopChanDatalogging = make(chan struct{})   // Channel to signal the goroutine to stop
+	wg       sync.WaitGroup  // WaitGroup to ensure clean shutdown of goroutine
+)
+
+
 // **********************************************************************************************************
 
 // Testing
@@ -90,34 +103,12 @@ func containsCurrentCoordinates2(min float64, max float64, current float64) bool
   return false
 }
 
-// -- How to do this --
-// We've defined the tracks start line coordinates
-// Now we need to bring in the current GPS location, tak it and iterate to see if it's the tracks one
-func (currentLapData *CurrentLapData) startFinishLineDetection(currentLat float64, currentLon float64, currentTime time.Time) {
-  timeDiff := currentTime.Sub(currentLapData.LapStartTime)
-  currentLapData.CurrentLapTime = int32(timeDiff.Milliseconds())
 
-  // Testing: This will only go off the actual points
-  // if containsCurrentCoordinates(tracks.TestLat[:], currentLat) && containsCurrentCoordinates(tracks.TestLon[:], currentLon) {
-  //   fmt.Println("yay1")
-  // }
-  
-  if containsCurrentCoordinates2(tracks.TestLatMin, tracks.TestLatMax, currentLat) {
-    if containsCurrentCoordinates2(tracks.TestLonMin, tracks.TestLonMax, currentLon) {
-      if currentLapData.CurrentLapTime < lapStats.BestLapTime || lapStats.BestLapTime == 0 {
-        lapStats.BestLapTime = currentLapData.CurrentLapTime
-      }
-      if currentLapData.CurrentLapTime < lapStats.PbLapTime || lapStats.PbLapTime == 0 {
-        lapStats.PbLapTime = currentLapData.CurrentLapTime
-      }
-      lapStats.PreviousLapTime = currentLapData.CurrentLapTime
-      
-      // Start the next lap
-      currentLapData.LapStartTime = currentTime
-      lapStats.LapCounter++;
+func (wsConn *MySocket) writeToClient(writeType int, data []byte) {
+  wsConn.mutex.Lock()
+  defer wsConn.mutex.Unlock()
 
-      // Send up to client
-      jsonData, err := json.Marshal(lapStats)
+  err := wsConn.conn.WriteMessage(websocket.TextMessage, data)
       if err != nil {
         log.Fatal("Json Marshall error (Lap Stats)")
       }
@@ -128,8 +119,7 @@ func (currentLapData *CurrentLapData) startFinishLineDetection(currentLat float6
   }
 }
 
-
-func handleGpsLapTiming() {
+func (wsConn *MySocket) handleGpsLapTiming() {
 	// Connect to the GPSD server
 	gps, err := gpsd.Dial("localhost:2947")
 	if err != nil {
@@ -160,16 +150,7 @@ func handleGpsLapTiming() {
 		if err != nil {
 			log.Fatal("Json Marshall error (GPS): ", err)
 		}
-    // Send up to client
-		if err := wsConn.WriteMessage(websocket.TextMessage, jsonData); err != nil {
-			if websocket.IsUnexpectedCloseError(err) {
-        fmt.Println("Unexpected close error: ", err)
-      } else {
-        fmt.Println("Write error (GPS): ", err)
-      }
-      wsConn.Close()
-			return
-		}
+    wsConn.writeToClient(2, jsonData)
 	}
   
 	gps.AddFilter("TPV", tpvFilter)
@@ -178,30 +159,31 @@ func handleGpsLapTiming() {
 	gps.Close()
 }
 
-
-func handleWs(w http.ResponseWriter, r *http.Request) {
-  var err error
-  wsConn, err = upgrader.Upgrade(w, r, nil)
-  if err != nil {
-      log.Println("Error upgrading WebSocket: ", err)
-      return
-  }
-  defer wsConn.Close()
-
-  // ---------- Lap Timing ----------
-  go handleGpsLapTiming()
-
+func (wsConn *MySocket) handleCanBusData() {
   // ---------- CANBus data ----------
   canConn, _ := socketcan.DialContext(context.Background(), "can", configCanDevice)
   defer canConn.Close()
   canRecv:= socketcan.NewReceiver(canConn)
 
-  canData := CanData{Type: 1}
+  // canData := CanData{Type: 1}
+
+	wg.Add(1)
+  go func() {
+    defer wg.Done()
+    cmd := exec.Command("/home/pi/dev/wt-datalogging/wt-datalogging")
+    output, err := cmd.Output()
+    if err != nil {
+      fmt.Println("Error running datalogging: ", err)
+    }
+    fmt.Println(string(output))
+  }()
+	
 
   for canRecv.Receive() {
     frame := canRecv.Frame()
     
     switch frame.ID {
+      // case 69, 105:        
       case 660, 1632:
         canData.Rpm = binary.BigEndian.Uint16(frame.Data[0:2])
         canData.Speed = binary.BigEndian.Uint16(frame.Data[2:4])
@@ -233,28 +215,40 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
       log.Println("Json Marshal error (CAN): ", err)
       return
     }
-    if err := wsConn.WriteMessage(websocket.TextMessage, jsonData); err != nil {
-      fmt.Println("Write error (CAN): ", err)
+    wsConn.writeToClient(1, jsonData)
+  }
+}
+
+
+func handleWs(w http.ResponseWriter, r *http.Request) {
+  // ---------- Web Socket Setup ----------
+  wsConn := MySocket{}
+
+  var err error
+  wsConn.conn, err = upgrader.Upgrade(w, r, nil)
+  if err != nil {
+      log.Println("Error upgrading WebSocket: ", err)
       return
     }
   defer wsConn.conn.Close()
 
-  var wg sync.WaitGroup
-  wg.Add(2)
-
+  // ===============================================================  
   // ---------- Handle CAN data ----------
+  wg.Add(1)
   go func() {
     defer wg.Done()
     wsConn.handleCanBusData()
   }()
 
   // ---------- Lap Timing ----------
+  wg.Add(1)
   go func() {
     defer wg.Done()
     wsConn.handleGpsLapTiming()
   }()
 
   wg.Wait()
+  // ===============================================================
 }
 
 
