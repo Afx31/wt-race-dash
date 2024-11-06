@@ -82,10 +82,7 @@ var (
 )
 // **********************************************************************************************************
 
-func containsCurrentCoordinates(min float64, max float64, current float64) bool {
-  if (min <= current && current >= max) {
-    return true
-  }
+func isThisTheFinishLine(min float64, max float64, current float64) bool {
   if (current >= min && current <= max) {
     return true
   }
