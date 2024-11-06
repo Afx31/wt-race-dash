@@ -149,12 +149,16 @@ func (wsConn *MySocket) handleGpsLapTiming() {
         log.Fatal("Json Marshall error (Lap Stats)")
       }
       wsConn.writeToClient(3, jsonData)
+
+			// TESTING
+			time.Sleep(10 * time.Second)
     }
-		jsonData2, err := json.Marshal(lapStats)
-      if err != nil {
-        log.Fatal("Json Marshall error (Lap Stats)")
-      }
-      wsConn.writeToClient(3, jsonData2)
+
+		// jsonData2, err := json.Marshal(lapStats)
+		// if err != nil {
+		// 	log.Fatal("Json Marshall error (Lap Stats)")
+		// }
+		// wsConn.writeToClient(3, jsonData2)
 
 		jsonData, err := json.Marshal(currentLapData)
 		if err != nil {
