@@ -62,7 +62,7 @@ var (
     ReadBufferSize:  1024,
     WriteBufferSize: 1024,
   }
-  lapStats = LapStats{Type: 3, LapCount: 1}
+  lapStats = LapStats{Type: 3, LapCount: 0}
   canData = CanData{Type: 1}
 
   // --- Data conversion constants ---
@@ -83,12 +83,8 @@ var (
 // **********************************************************************************************************
 
 func isThisTheFinishLine(min float64, max float64, current float64) bool {
-  if (current >= min && current <= max) {
-    return true
-  }
-  return false
+  return current >= min && current <= max
 }
-
 
 func (wsConn *MySocket) writeToClient(writeType int, data []byte) {
   wsConn.mutex.Lock()
@@ -133,7 +129,7 @@ func (wsConn *MySocket) handleGpsLapTiming() {
     // Testing
     //fmt.Println(report.Lat, ", ", report.Lon)
 
-    if containsCurrentCoordinates(tracks.MorganParkLatMin, tracks.MorganParkLatMax, report.Lat) && containsCurrentCoordinates(tracks.MorganParkLonMin, tracks.MorganParkLonMax, report.Lon) {
+    if isThisTheFinishLine(tracks.MorganParkLatMin, tracks.MorganParkLatMax, report.Lat) && isThisTheFinishLine(tracks.MorganParkLonMin, tracks.MorganParkLonMax, report.Lon) {
 			// Do lap stats
       if (currentLapData.CurrentLapTime < lapStats.BestLapTime) || lapStats.BestLapTime == 0 {
         lapStats.BestLapTime = currentLapData.CurrentLapTime
