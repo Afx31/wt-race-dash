@@ -30,7 +30,7 @@ type CanData struct {
 	Rpm uint16
 	Speed uint16
 	Gear uint8
-	Voltage uint8
+	Voltage float32
 	Iat uint16
 	Ect uint16
 	Tps uint16
@@ -203,7 +203,7 @@ func (wsConn *MySocket) handleCanBusData() {
         canData.Rpm = binary.BigEndian.Uint16(frame.Data[0:2])
         canData.Speed = binary.BigEndian.Uint16(frame.Data[2:4])
         canData.Gear = frame.Data[4]
-        canData.Voltage = frame.Data[5] / 10
+        canData.Voltage = float32(math.Round(float64(float32(frame.Data[5]) * 1.05) * 10)) / 10
       case 661, 1633:
         canData.Iat = binary.BigEndian.Uint16(frame.Data[0:2])
         canData.Ect = binary.BigEndian.Uint16(frame.Data[2:4])
