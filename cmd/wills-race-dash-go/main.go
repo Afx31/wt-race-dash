@@ -35,7 +35,7 @@ type CanData struct {
 	Ect uint16
 	Tps uint16
 	Map uint16
-	LambdaRatio uint16
+	LambdaRatio float64
 	OilTemp uint16
 	OilPressure uint16
 }
@@ -212,7 +212,7 @@ func (wsConn *MySocket) handleCanBusData() {
 				if canData.Tps == 65535 { canData.Tps = 0	}
         canData.Map = binary.BigEndian.Uint16(frame.Data[2:4]) / 10
       case 664, 1636:
-        canData.LambdaRatio = 32768 / binary.BigEndian.Uint16(frame.Data[0:2])
+        canData.LambdaRatio = math.Round(float64(32768.0) / float64(binary.BigEndian.Uint16(frame.Data[0:2])) * 100) / 100
       case 667, 1639:
         // Oil Temp
         oilTempResistance := binary.BigEndian.Uint16(frame.Data[0:2])
