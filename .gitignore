@@ -1,2 +1,3 @@
 cmd/wills-race-dash-go/wills-race-dash-go
 *.csv
+/bin
