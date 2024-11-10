@@ -185,7 +185,7 @@ func (wsConn *MySocket) handleCanBusData() {
 	wg.Add(1)
   go func() {
     defer wg.Done()
-    cmd := exec.Command("/home/pi/dev/wt-datalogging/wt-datalogging")
+    cmd := exec.Command("/home/pi/dev/wt-datalogging/bin/wt-datalogging")
     output, err := cmd.Output()
     if err != nil {
       fmt.Println("Error running datalogging: ", err)
