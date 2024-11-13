@@ -72,6 +72,7 @@ var (
   }
   lapStats = LapStats{Type: 3, LapCount: 0}
   canData = CanData{Type: 1}
+  currentTrack tracks.Track
 
   // --- Data conversion constants ---
   // Oil Temp
@@ -139,7 +140,7 @@ func (wsConn *MySocket) handleGpsLapTiming() {
     // Testing
     //fmt.Println(report.Lat, ", ", report.Lon)
 
-    if isThisTheFinishLine(tracks.MorganParkLatMin, tracks.MorganParkLatMax, report.Lat) && isThisTheFinishLine(tracks.MorganParkLonMin, tracks.MorganParkLonMax, report.Lon) {
+    if isThisTheFinishLine(currentTrack.LatMin, currentTrack.LatMax, report.Lat) && isThisTheFinishLine(currentTrack.LonMin, currentTrack.LonMax, report.Lon) {
 			// Do lap stats
       if (currentLapData.CurrentLapTime < lapStats.BestLapTime) || lapStats.BestLapTime == 0 {
         lapStats.BestLapTime = currentLapData.CurrentLapTime
