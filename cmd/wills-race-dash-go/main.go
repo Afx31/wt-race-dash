@@ -292,7 +292,7 @@ func main() {
   // ----------------------------------------------------------------
 
   // Serve all static files from the 'web' directory
-  fs := http.FileServer(http.Dir("../../web"))
+  fs := http.FileServer(http.Dir("../web"))
   http.Handle("/", fs)
 
   // Handle WebSocket connection
