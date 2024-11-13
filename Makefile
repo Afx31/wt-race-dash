@@ -14,4 +14,5 @@ clean:
 	rm ./${BINARY_NAME}
 
 buildfull:
+	make build
 	cd ${DATALOG_BINARY_DIR} && go build -o ${DATALOG_BINARY_NAME}
