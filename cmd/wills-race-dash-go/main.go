@@ -6,9 +6,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"math"
 	"net/http"
+	"os"
 	"os/exec"
 	"sync"
 	"time"
@@ -19,6 +21,12 @@ import (
 	"github.com/stratoberry/go-gpsd"
 	"go.einride.tech/can/pkg/socketcan"
 )
+
+type AppSettings struct {
+  CanChannel string `json:"canChannel"`
+  Track string `json:"track"`
+  Car string `json:"car"`
+}
 
 type MySocket struct {
   conn *websocket.Conn
@@ -55,8 +63,8 @@ type LapStats struct {
 }
 
 var (
+  appSettings *AppSettings
   addr = flag.String("addr", ":8080", "http service address")
-  configCanDevice = "can0"
   configStopDataloggingId = uint32(105)
   upgrader = websocket.Upgrader{
     ReadBufferSize:  1024,
@@ -178,12 +186,13 @@ func (wsConn *MySocket) handleGpsLapTiming() {
 
 func (wsConn *MySocket) handleCanBusData() {
   // ---------- CANBus data ----------
-  canConn, _ := socketcan.DialContext(context.Background(), "can", configCanDevice)
+  canConn, _ := socketcan.DialContext(context.Background(), "can", appSettings.CanChannel)
   defer canConn.Close()
   canRecv:= socketcan.NewReceiver(canConn)
 
   // canData := CanData{Type: 1}
 
+  // ---------- Datalogging ----------
 	wg.Add(1)
   go func() {
     defer wg.Done()
@@ -269,6 +278,18 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
 func main() {
   fmt.Println("---------- Server running ----------")
 
+	// -------------------- Read in settings file first --------------------
+	settingsFile, err := os.Open("/home/pi/dev/wt-racedash-settings.json")
+	if err != nil {
+		log.Fatal("Error: Cannot read in settings file")
+	}
+	defer settingsFile.Close()
+
+	data, _ := io.ReadAll(settingsFile)
+  json.Unmarshal(data, &appSettings)
+  currentTrack = tracks.Tracks[appSettings.Track]
+  // ----------------------------------------------------------------
+
   // Serve all static files from the 'web' directory
   fs := http.FileServer(http.Dir("../../web"))
   http.Handle("/", fs)
@@ -277,7 +298,7 @@ func main() {
   http.HandleFunc("/ws", handleWs)
 
   fmt.Println("Server starting at :8080")
-  err := http.ListenAndServe(*addr, nil)
+  err = http.ListenAndServe(*addr, nil)
   if err != nil {
     log.Fatal("ListenAndServe: ", err)
   }
