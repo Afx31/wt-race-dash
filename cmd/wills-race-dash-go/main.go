@@ -26,7 +26,7 @@ type MySocket struct {
 }
 
 type CanData struct {
-	Type uint8
+	Type int8
 	Rpm uint16
 	Speed uint16
 	Gear uint8
@@ -86,7 +86,9 @@ func isThisTheFinishLine(min float64, max float64, current float64) bool {
   return current >= min && current <= max
 }
 
-func (wsConn *MySocket) writeToClient(writeType int, data []byte) {
+
+
+func (wsConn *MySocket) writeToClient(writeType int8, data []byte) {
   wsConn.mutex.Lock()
   defer wsConn.mutex.Unlock()
 
@@ -148,7 +150,7 @@ func (wsConn *MySocket) handleGpsLapTiming() {
       if err != nil {
         log.Fatal("Json Marshall error (Lap Stats)")
       }
-      wsConn.writeToClient(3, jsonData)
+      wsConn.writeToClient(lapStats.Type, jsonData)
 
 			// TESTING
 			time.Sleep(10 * time.Second)
@@ -164,7 +166,7 @@ func (wsConn *MySocket) handleGpsLapTiming() {
 		if err != nil {
 			log.Fatal("Json Marshall error (GPS): ", err)
 		}
-    wsConn.writeToClient(2, jsonData)
+    wsConn.writeToClient(currentLapData.Type, jsonData)
 	}
   
 	gps.AddFilter("TPV", tpvFilter)
@@ -192,7 +194,6 @@ func (wsConn *MySocket) handleCanBusData() {
     }
     fmt.Println(string(output))
   }()
-	
 
   for canRecv.Receive() {
     frame := canRecv.Frame()
@@ -218,7 +219,6 @@ func (wsConn *MySocket) handleCanBusData() {
         oilTempResistance := binary.BigEndian.Uint16(frame.Data[0:2])
         kelvinTemp := 1 / (A + B * math.Log(float64(oilTempResistance)) + C * math.Pow(math.Log(float64(oilTempResistance)), 3))
         canData.OilTemp = uint16(kelvinTemp - 273.15)
-
         // Oil Pressure
         oilPressureResistance := float64(binary.BigEndian.Uint16(frame.Data[2:4])) / 819.2
         kPaValue := ((float64(oilPressureResistance) - originalLow) / (originalHigh - originalLow) * (desiredHigh - desiredLow)) + desiredLow
@@ -230,7 +230,7 @@ func (wsConn *MySocket) handleCanBusData() {
       log.Println("Json Marshal error (CAN): ", err)
       return
     }
-    wsConn.writeToClient(1, jsonData)
+    wsConn.writeToClient(canData.Type, jsonData)
   }
 }
 
@@ -238,7 +238,6 @@ func (wsConn *MySocket) handleCanBusData() {
 func handleWs(w http.ResponseWriter, r *http.Request) {
   // ---------- Web Socket Setup ----------
   wsConn := MySocket{}
-
   var err error
   wsConn.conn, err = upgrader.Upgrade(w, r, nil)
   if err != nil {
