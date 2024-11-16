@@ -25,6 +25,7 @@ import (
 type AppSettings struct {
   CanChannel string `json:"canChannel"`
   Track string `json:"track"`
+	LoggingHertz int `json:"loggingHertz"`
   Car string `json:"car"`
 }
 
@@ -65,7 +66,6 @@ type LapStats struct {
 var (
   appSettings *AppSettings
   addr = flag.String("addr", ":8080", "http service address")
-  configStopDataloggingId = uint32(105)
   upgrader = websocket.Upgrader{
     ReadBufferSize:  1024,
     WriteBufferSize: 1024,
@@ -289,7 +289,7 @@ func main() {
 	data, _ := io.ReadAll(settingsFile)
   json.Unmarshal(data, &appSettings)
   currentTrack = tracks.Tracks[appSettings.Track]
-  // ----------------------------------------------------------------
+  // ---------------------------------------------------------------------
 
   // Serve all static files from the 'web' directory
   fs := http.FileServer(http.Dir("../web"))

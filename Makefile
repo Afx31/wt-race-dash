@@ -13,6 +13,6 @@ clean:
 	go clean
 	rm ./${BINARY_NAME}
 
-buildfull:
+buildall:
 	make build
 	cd ${DATALOG_BINARY_DIR} && go build -o ${DATALOG_BINARY_NAME}
