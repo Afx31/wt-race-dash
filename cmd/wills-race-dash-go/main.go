@@ -191,8 +191,6 @@ func (wsConn *MySocket) handleCanBusData() {
   defer canConn.Close()
   canRecv:= socketcan.NewReceiver(canConn)
 
-  // canData := CanData{Type: 1}
-
   // ---------- Datalogging ----------
 	wg.Add(1)
   go func() {
@@ -214,7 +212,7 @@ func (wsConn *MySocket) handleCanBusData() {
         canData.Rpm = binary.BigEndian.Uint16(frame.Data[0:2])
         canData.Speed = binary.BigEndian.Uint16(frame.Data[2:4])
         canData.Gear = frame.Data[4]
-        canData.Voltage = float32(math.Round(float64(float32(frame.Data[5]) * 1.05) * 10)) / 10
+        canData.Voltage = float32(frame.Data[5]) / 10.0
       case 661, 1633:
         canData.Iat = binary.BigEndian.Uint16(frame.Data[0:2])
         canData.Ect = binary.BigEndian.Uint16(frame.Data[2:4])
