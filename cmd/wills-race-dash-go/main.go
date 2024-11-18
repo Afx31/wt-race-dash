@@ -52,15 +52,15 @@ type CanData struct {
 type CurrentLapData struct {
 	Type int8
   LapStartTime time.Time
-	CurrentLapTime int32
+	CurrentLapTime uint32
 }
 
 type LapStats struct {
   Type int8
   LapCount int8
-	BestLapTime int32
-	PbLapTime int32
-	PreviousLapTime int32
+	BestLapTime uint32
+	PbLapTime uint32
+	PreviousLapTime uint32
 }
 
 var (
@@ -135,7 +135,7 @@ func (wsConn *MySocket) handleGpsLapTiming() {
 	
     // ---------- GPS/Lap Timing ----------
     timeDiff := convertedCurrentTime.Sub(currentLapData.LapStartTime)
-    currentLapData.CurrentLapTime = int32(timeDiff.Milliseconds())
+    currentLapData.CurrentLapTime = uint32(timeDiff.Milliseconds())
 
     // Testing
     //fmt.Println(report.Lat, ", ", report.Lon)
