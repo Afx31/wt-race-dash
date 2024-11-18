@@ -57,7 +57,7 @@ type CurrentLapData struct {
 
 type LapStats struct {
   Type int8
-  LapCount int8
+  LapCount uint8
 	BestLapTime uint32
 	PbLapTime uint32
 	PreviousLapTime uint32
