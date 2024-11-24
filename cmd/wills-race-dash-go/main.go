@@ -185,29 +185,43 @@ func (wsConn *MySocket) handleGpsLapTiming() {
 }
 
 
-func (wsConn *MySocket) handleCanBusData() {
-  // ---------- CANBus data ----------
-  canConn, _ := socketcan.DialContext(context.Background(), "can", appSettings.CanChannel)
-  defer canConn.Close()
-  canRecv:= socketcan.NewReceiver(canConn)
+func doDatalogging(dataloggingRunning *bool, wg *sync.WaitGroup) {
+	defer wg.Done()
 
-  // ---------- Datalogging ----------
-	wg.Add(1)
-  go func() {
-    defer wg.Done()
-    cmd := exec.Command("/home/pi/dev/wt-datalogging/bin/wt-datalogging")
+	for {
+		if *dataloggingRunning {
+			fmt.Println("--- Datalogging: Finish ---")
+			return
+		}
+
+		fmt.Println("--- Datalogging: Start ---")
+		cmd := exec.Command("/home/pi/dev/wt-datalogging/bin/wt-datalogging")
     output, err := cmd.Output()
     if err != nil {
       fmt.Println("Error running datalogging: ", err)
     }
+		
     fmt.Println(string(output))
-  }()
+	}
+}
+
+func (wsConn *MySocket) handleCanBusData() {
+  // ---------- CANBus data ----------
+  canConn, _ := socketcan.DialContext(context.Background(), "can", appSettings.CanChannel)
+  defer canConn.Close()
+	canRecv := socketcan.NewReceiver(canConn)
+	isDatalogging := false
 
   for canRecv.Receive() {
     frame := canRecv.Frame()
     
     switch frame.ID {
-      // case 69, 105:        
+      case 69, 105:
+				wg.Add(1)
+			go doDatalogging(&isDatalogging, &wg)
+				time.Sleep(1 * time.Second)
+			isDatalogging = !isDatalogging
+			canData.DataloggingAlert = isDatalogging
       case 660, 1632:
         canData.Rpm = binary.BigEndian.Uint16(frame.Data[0:2])
         canData.Speed = binary.BigEndian.Uint16(frame.Data[2:4])
