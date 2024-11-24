@@ -190,11 +190,11 @@ func doDatalogging(dataloggingRunning *bool, wg *sync.WaitGroup) {
 
 	for {
 		if *dataloggingRunning {
-			fmt.Println("End datalogging")
+			fmt.Println("--- Datalogging: Finish ---")
 			return
 		}
 
-		fmt.Println("Start datalogging")
+		fmt.Println("--- Datalogging: Start ---")
 		cmd := exec.Command("/home/pi/dev/wt-datalogging/bin/wt-datalogging")
     output, err := cmd.Output()
     if err != nil {
@@ -205,35 +205,12 @@ func doDatalogging(dataloggingRunning *bool, wg *sync.WaitGroup) {
 	}
 }
 
-// func doDatalogging(stopDataloggingChannel chan struct{}, wg *sync.WaitGroup) {
-// 	defer wg.Done()
-// 	for {
-// 		select {
-// 		case <-stopDataloggingChannel:
-// 			fmt.Println("stopping")
-// 			return
-// 		default:
-// 			fmt.Println("running")
-// 			cmd := exec.Command("/home/pi/dev/wt-datalogging/bin/wt-datalogging")
-// 			output, err := cmd.Output()
-
-// 			if err != nil {
-// 				fmt.Println("Error running datalogging: ", err)
-// 			}
-// 			fmt.Println(string(output))
-// 		}
-// 	}
-// }
-
-
 func (wsConn *MySocket) handleCanBusData() {
   // ---------- CANBus data ----------
   canConn, _ := socketcan.DialContext(context.Background(), "can", appSettings.CanChannel)
   defer canConn.Close()
-  canRecv:= socketcan.NewReceiver(canConn)
-
-	// var stopDataloggingChannel chan struct{}
-	dataloggingRunning := false	
+	canRecv := socketcan.NewReceiver(canConn)
+	isDatalogging := false
 
   for canRecv.Receive() {
     frame := canRecv.Frame()
@@ -241,20 +218,10 @@ func (wsConn *MySocket) handleCanBusData() {
     switch frame.ID {
       case 69, 105:
 				wg.Add(1)
-				go doDatalogging(&dataloggingRunning, &wg)
+			go doDatalogging(&isDatalogging, &wg)
 				time.Sleep(1 * time.Second)
-				dataloggingRunning = !dataloggingRunning
-				canData.DataloggingAlert = dataloggingRunning
-				// if dataloggingRunning {
-				// 	close(stopChanDatalogging)
-				// 	dataloggingRunning = false
-				// } else {
-				// 	stopDataloggingChannel = make(chan struct{})
-				// 	wg.Add(1)
-				// 	go doDatalogging(stopDataloggingChannel, &wg)
-				// 	time.Sleep(1 * time.Second)
-				// 	dataloggingRunning = true
-				// }
+			isDatalogging = !isDatalogging
+			canData.DataloggingAlert = isDatalogging
       case 660, 1632:
         canData.Rpm = binary.BigEndian.Uint16(frame.Data[0:2])
         canData.Speed = binary.BigEndian.Uint16(frame.Data[2:4])
