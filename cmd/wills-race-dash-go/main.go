@@ -31,49 +31,49 @@ type AppSettings struct {
 }
 
 type MySocket struct {
-  conn *websocket.Conn
+	conn  *websocket.Conn
   mutex sync.Mutex
 }
 
 type CanData struct {
-	Type int8
-	Rpm uint16
-	Speed uint16
-	Gear uint8
-	Voltage float32
-	Iat uint16
-	Ect uint16
-	Tps uint16
-	Map uint16
-	LambdaRatio float64
-	OilTemp uint16
-	OilPressure uint16
+	Type             int8
+	Rpm              uint16
+	Speed            uint16
+	Gear             uint8
+	Voltage          float32
+	Iat              uint16
+	Ect              uint16
+	Tps              uint16
+	Map              uint16
+	LambdaRatio      float64
+	OilTemp          uint16
+	OilPressure      uint16
 }
 
 type CurrentLapData struct {
-	Type int8
-  LapStartTime time.Time
+	Type           int8
+	LapStartTime   time.Time
 	CurrentLapTime uint32
 }
 
 type LapStats struct {
-  Type int8
-  LapCount uint8
-	BestLapTime uint32
-	PbLapTime uint32
+	Type            int8
+	LapCount        uint8
+	BestLapTime     uint32
+	PbLapTime       uint32
 	PreviousLapTime uint32
 }
 
 var (
   appSettings *AppSettings
-  addr = flag.String("addr", ":8080", "http service address")
-  upgrader = websocket.Upgrader{
+	addr        = flag.String("addr", ":8080", "http service address")
+	upgrader    = websocket.Upgrader{
     ReadBufferSize:  1024,
     WriteBufferSize: 1024,
   }
-  lapStats = LapStats{Type: 3, LapCount: 0}
-  canData = CanData{Type: 1}
-  currentTrack tracks.Track
+	lapStats      = LapStats{Type: 3, LapCount: 0}
+	canData       = CanData{Type: 1}
+	currentTrack  tracks.Track
 
   // --- Data conversion constants ---
   // Oil Temp
@@ -81,15 +81,16 @@ var (
 	B = 0.00023729017
 	C = 9.3273998E-8
 	// Oil Pressure
-	originalLow float64 = 0 //0.5
-	originalHigh float64 = 5 //4.5
-	desiredLow float64 = -100 //0
-	desiredHigh float64 = 1100 //1000
+	originalLow  float64 = 0    //0.5
+	originalHigh float64 = 5    //4.5
+	desiredLow   float64 = -100 //0
+	desiredHigh  float64 = 1100 //1000
 
 	// Testing
-	stopChanDatalogging = make(chan struct{})   // Channel to signal the goroutine to stop
-	wg sync.WaitGroup  // WaitGroup to ensure clean shutdown of goroutine
+	stopChanDatalogging = make(chan struct{}) // Channel to signal the goroutine to stop
+	wg sync.WaitGroup // WaitGroup to ensure clean shutdown of goroutine
 )
+
 // **********************************************************************************************************
 
 func isThisTheFinishLine(min float64, max float64, current float64) bool {
@@ -160,6 +161,7 @@ func (wsConn *MySocket) handleGpsLapTiming() {
       if err != nil {
         log.Fatal("Json Marshall error (Lap Stats)")
       }
+
       wsConn.writeToClient(lapStats.Type, jsonData)
 
 			// TESTING
