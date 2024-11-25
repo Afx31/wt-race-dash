@@ -23,10 +23,11 @@ import (
 )
 
 type AppSettings struct {
-  CanChannel string `json:"canChannel"`
-  Track string `json:"track"`
-	LoggingHertz int `json:"loggingHertz"`
-  Car string `json:"car"`
+	CanChannel    string `json:"canChannel"`
+	Track         string `json:"track"`
+  LapTiming     bool   `json:"lapTiming"`
+	LoggingHertz  int    `json:"loggingHertz"`
+	Car           string `json:"car"`
 }
 
 type MySocket struct {
@@ -277,10 +278,19 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
   }()
 
   // ---------- Lap Timing ----------
+  if (appSettings.LapTiming) {
   wg.Add(1)
   go func() {
     defer wg.Done()
     wsConn.handleGpsLapTiming()
+    }()
+  }
+
+	// ---------- Warning Alerts ----------
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		wsConn.handleWarningAlerts()
   }()
 
   wg.Wait()
