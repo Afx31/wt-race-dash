@@ -111,12 +111,23 @@ func (wsConn *MySocket) writeToClient(writeType int8, data []byte) {
 }
 
 func (wsConn *MySocket) handleGpsLapTiming() {
+	var gps *gpsd.Session
+	var err error
+
 	// Connect to the GPSD server
-	gps, err := gpsd.Dial("localhost:2947")
+	for {
+		gps, err = gpsd.Dial("localhost:2947")
 	if err != nil {
 		fmt.Println("Failed to connect to GPSD: ", err)
-		return
+			fmt.Println("Retrying in 10 seconds...")
+			time.Sleep(10 * time.Second)
+			continue
+		}
+
+		fmt.Println("Connected to GPSD")
+		break
 	}
+	defer gps.Close()
 
 	currentLapData := CurrentLapData{Type: 2}
   currentLapData.LapStartTime = time.Now().Round(100 * time.Millisecond)
