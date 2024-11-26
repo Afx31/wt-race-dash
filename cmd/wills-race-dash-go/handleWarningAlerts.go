@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"log"
-	"time"
 )
 
 type WarningAlerts struct {
@@ -15,6 +14,10 @@ type WarningAlerts struct {
 
 var (
 	warningAlerts = WarningAlerts{Type: 4}
+	sendDataTrigger			bool
+	previousCoolantTemp bool
+	previousOilTemp     bool
+	previousOilPressure bool
 )
 
 func (wsConn *MySocket) HandleWarningAlerts() {
@@ -23,13 +26,31 @@ func (wsConn *MySocket) HandleWarningAlerts() {
 		warningAlerts.AlertOilTemp = int(canData.OilTemp) > appSettings.WarningValues["warningOilTemp"]
 		warningAlerts.AlertOilPressure = int(canData.OilPressure) > appSettings.WarningValues["warningOilPressure"]
 
-		jsonData, err := json.Marshal(warningAlerts)
-		if err != nil {
-			log.Println("Json Marshal error (Warning Alerts): ", err)
-			return
+		if (previousCoolantTemp != warningAlerts.AlertCoolantTemp) {
+			sendDataTrigger = true
+			previousCoolantTemp = !previousCoolantTemp
 		}
-    
-		wsConn.writeToClient(warningAlerts.Type, jsonData)
-		time.Sleep(5 * time.Second)
+		if (previousOilTemp != warningAlerts.AlertOilTemp) {
+			sendDataTrigger = true
+			previousOilTemp = !previousOilTemp
+		}
+		if (previousOilPressure != warningAlerts.AlertOilPressure) {
+			sendDataTrigger = true
+			previousOilPressure = !previousOilPressure
+		}
+
+		// Only send up IF it's a new value
+		if (sendDataTrigger) {
+			jsonData, err := json.Marshal(warningAlerts)
+			if err != nil {
+				log.Println("Json Marshal error (Warning Alerts): ", err)
+				return
+			}
+			
+			wsConn.writeToClient(warningAlerts.Type, jsonData)
+
+			// Cleanup
+			sendDataTrigger = false
+		}
 	}
 }
