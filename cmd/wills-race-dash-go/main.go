@@ -21,6 +21,7 @@ type AppSettings struct {
   LapTiming     bool   `json:"lapTiming"`
 	LoggingHertz  int    `json:"loggingHertz"`
 	Car           string `json:"car"`
+	WarningAlerts bool	 `json:"warningAlerts"`
 	WarningValues map[string]int
 }
 
@@ -85,11 +86,13 @@ func handleWs(w http.ResponseWriter, r *http.Request) {
 
 	// ---------- Warning Alerts ----------
 	// TODO: Requires further performance testing
-	// wg.Add(1)
-	// go func() {
-	// 	defer wg.Done()
-	// 	wsConn.HandleWarningAlerts()
-	// }()
+	if (appSettings.WarningAlerts) {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			wsConn.HandleWarningAlerts()
+		}()
+	}
 
 	wg.Wait()
 	// ===============================================================
