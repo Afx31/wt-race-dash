@@ -75,6 +75,21 @@ document.addEventListener('DOMContentLoaded', () => {
         bestLap.textContent = `${bestLapMinutes}:${bestLapSeconds}.${bestLapMilliseconds}`;
         pbLap.textContent = `${pbLapMinutes}:${pbLapSeconds}.${pbLapMilliseconds}`;
         break;
+      // case 4:
+      //   if (data.AlertCoolantTemp)
+      //     ect.style.setProperty('background-color', 'red')
+      //   else
+      //     ect.style.setProperty('background-color', 'transparent')
+
+      //   if (data.AlertOilTemp)
+      //     oilTemp.style.setProperty('background-color', 'red')
+      //   else
+      //     oilTemp.style.setProperty('background-color', 'transparent')
+
+      //   if (data.AlertOilPressure)
+      //     oilPressure.style.setProperty('background-color', 'red')
+      //   else
+      //     oilPressure.style.setProperty('background-color', 'transparent')
     }
   }
 });
