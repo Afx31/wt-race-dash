@@ -67,6 +67,7 @@ type CANFrame667 struct {
 
 
 var (
+	canFrameHandler = &CANFrameHandler{}
 	isDatalogging = false
 
 	// --- Data conversion constants ---
@@ -173,8 +174,7 @@ func (wsConn *MySocket) HandleCanBusData() {
 	// ---------- CANBus data ----------
 	canConn, _ := socketcan.DialContext(context.Background(), "can", appSettings.CanChannel)
 	defer canConn.Close()
-	canRecv := socketcan.NewReceiver(canConn)	
-	canFrameHandler := &CANFrameHandler{}
+	canRecv := socketcan.NewReceiver(canConn)
 
 	for canRecv.Receive() {
 		frame := canRecv.Frame()
