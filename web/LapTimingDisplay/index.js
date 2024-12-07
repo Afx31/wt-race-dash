@@ -34,23 +34,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
-    
     switch (data.Type) {
       case 1:
         switch (data.FrameId) {
           case 660:
             rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
-            tpsBar.style.height = data.Tps + '%';
             rpmNum.textContent = data.Rpm;
             speed.textContent = data.Speed;
-            break;
-          case 661:
             gear.textContent = data.Gear;
             voltage.textContent = data.Voltage;
             break;
-          case 662:
+          case 661:
             iat.textContent = data.Iat;
             ect.textContent = data.Ect;
+            break;
+          case 662:
+            tpsBar.style.height = data.Tps + '%';
             break;
           case 664:
             lambdaRatio.textContent = data.LambdaRatio;

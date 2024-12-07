@@ -196,9 +196,9 @@ func (wsConn *MySocket) HandleCanBusData() {
 		frame := canRecv.Frame()
 		jsonData := canFrameHandler.ProcessCANFrame(frame.ID, frame.Data)
 		if jsonData != nil {
-		wsConn.writeToClient(int8(frame.ID), jsonData)
+			wsConn.writeToClient(int8(frame.ID), jsonData)
+		}
 	}
-}
 }
 
 // func (wsConn *MySocket) HandleCanBusData() {
