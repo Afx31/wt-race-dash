@@ -193,15 +193,12 @@ func (wsConn *MySocket) HandleCanBusData() {
 	canFrameHandler := &CANFrameHandler{}
 
 	for canRecv.Receive() {
-		// read in the frame
 		frame := canRecv.Frame()
-		
-		// send frame to be processed, and get back the []byte
 		jsonData := canFrameHandler.ProcessCANFrame(frame.ID, frame.Data)
-		
-		// send up to client
+		if jsonData != nil {
 		wsConn.writeToClient(int8(frame.ID), jsonData)
 	}
+}
 }
 
 // func (wsConn *MySocket) HandleCanBusData() {
