@@ -125,8 +125,10 @@ func (wsConn *MySocket) HandleGpsLapTiming() {
 			if err != nil {
 				log.Fatal("Json Marshall error (Lap Stats)")
 			}
-
       wsConn.writeToClient(lapStats.Type, jsonData)
+
+      // Wait 3 seconds before continuing
+      time.Sleep(3 * time.Second)      
 		}
 
 		// Testing
