@@ -37,18 +37,29 @@ document.addEventListener('DOMContentLoaded', () => {
     
     switch (data.Type) {
       case 1:
-        // RPM progressive bar
-        rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
-        tpsBar.style.height = data.Tps + '%';
-        rpmNum.textContent = data.Rpm;
-        speed.textContent = data.Speed;
-        gear.textContent = data.Gear;
-        voltage.textContent = data.Voltage;
-        iat.textContent = data.Iat;
-        ect.textContent = data.Ect;
-        lambdaRatio.textContent = data.LambdaRatio;
-        oilTemp.textContent = data.OilTemp;
-        oilPressure.textContent = data.OilPressure;
+        switch (data.FrameId) {
+          case 660:
+            rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
+            tpsBar.style.height = data.Tps + '%';
+            rpmNum.textContent = data.Rpm;
+            speed.textContent = data.Speed;
+            break;
+          case 661:
+            gear.textContent = data.Gear;
+            voltage.textContent = data.Voltage;
+            break;
+          case 662:
+            iat.textContent = data.Iat;
+            ect.textContent = data.Ect;
+            break;
+          case 664:
+            lambdaRatio.textContent = data.LambdaRatio;
+            break;
+          case 667:
+            oilTemp.textContent = data.OilTemp;
+            oilPressure.textContent = data.OilPressure;
+            break;
+        }
         break;
       case 2:
         var currentLapMinutes = Math.floor((data.CurrentLapTime % 3600000) / 60000);
