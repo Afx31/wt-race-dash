@@ -15,22 +15,6 @@ import (
 	"go.einride.tech/can/pkg/socketcan"
 )
 
-type CanData struct {
-	Type             int8
-	Rpm              uint16
-	Speed            uint16
-	Gear             uint8
-	Voltage          float32
-	Iat              uint16
-	Ect              uint16
-	Tps              uint16
-	Map              uint16
-	LambdaRatio      float64
-	OilTemp          uint16
-	OilPressure      uint16
-  DataloggingAlert bool
-}
-
 type CANFrameHandler struct {
 	FrameMisc CANFrameMisc
 	Frame660 CANFrame660
@@ -200,6 +184,22 @@ func (wsConn *MySocket) HandleCanBusData() {
 		}
 	}
 }
+
+// type CanData struct {
+// 	Type             int8
+// 	Rpm              uint16
+// 	Speed            uint16
+// 	Gear             uint8
+// 	Voltage          float32
+// 	Iat              uint16
+// 	Ect              uint16
+// 	Tps              uint16
+// 	Map              uint16
+// 	LambdaRatio      float64
+// 	OilTemp          uint16
+// 	OilPressure      uint16
+//   DataloggingAlert bool
+// }
 
 // func (wsConn *MySocket) HandleCanBusData() {
 // 	// ---------- CANBus data ----------
