@@ -45,15 +45,25 @@ body {
   margin-top: 30px;
 }
 .data-title-cel {
-  border: 1px solid orange;
+  border: 2px solid red;
   margin-right: 10px;
   padding: 30px;
   font-size: 60px;
 }
 .data-title-datalogging {
-  border: 1px solid yellow;
+  border: 2px solid teal;
+  margin-right: -2px;
   padding: 30px;
   font-size: 60px;
+}
+
+.cel-blinker {
+  animation: blinker .5s infinite;
+}
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
 }
 
 /* ---------------------------------------------------------------- */
@@ -79,7 +89,7 @@ body {
   position: absolute;
   min-width: 1142px; /* 1905px, then 952px for 25% */
   width: 1142px; /* 1905px */
-  padding-top: 10px;
+  margin-top: -140px;
   margin-left: 20%;
   margin-right: 20%;
 }
@@ -93,7 +103,7 @@ body {
 .rpm-bar-grid-item-zero {
   position: absolute;
   width: auto;
-  margin-top: 10px; /* This to match `.rpm-bar-thousands-marks {padding-top}`  */
+  /* margin-top: 10px; */ /* This to match `.rpm-bar-thousands-marks {padding-top}`  */
 }
 .rpm-bar-grid-item-p {
   position: absolute;
@@ -104,6 +114,7 @@ body {
   margin: 0;
   font-size: 40px;
 }
+
 /* ---------------------------------------------------------------- */
 .middle-panel {
   border-bottom: solid 1px yellow;
@@ -121,6 +132,7 @@ body {
   padding: 10px;
   margin: 0;
 }
+
 /* ---------------------------------------------------------------- */
 .bottom-panel { 
   /* border: 0.5px solid red; */
@@ -218,39 +230,3 @@ body {
   font-size: 300px;
   margin: 0;
 }
-
-.info-panel-lap {
-  /* border: 1px solid yellow; */
-  padding: 0px 0px 40px 0px;
-  margin: -150px 280px 20px 0px;
-  height: 68px;
-  width: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.data-title-lap {
-  font-size: 80px;
-  margin-left: 140px;
-}
-.data-title-lap-count {
-  font-size: 80px;
-  margin-left: 30px;
-}
-
-/* .info-panel-datalogging {
-  border: 1px solid yellow;
-  padding: 0px 0px 40px 0px;
-  margin: -150px 1000px 0px 0px;
-  height: 68px;
-  width: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.data-title-datalogging {
-  font-size: 40px;
-  margin: 0px;
-} */
