@@ -32,8 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
   var bestLap = document.getElementById('bestLapTime');
   var pbLap = document.getElementById('pbLapTime');
 
+  var checkEngineLightAlert = document.getElementById('celAlert');
+  var dataLoggingAlert = document.getElementById('dataloggingAlert');
+
   socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
+
     switch (data.Type) {
       case 1:
         switch (data.FrameId) {
@@ -60,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
             break;
         }
         break;
+      
       case 2:
         var currentLapMinutes = Math.floor((data.CurrentLapTime % 3600000) / 60000);
         var currentLapSeconds = (Math.floor((data.CurrentLapTime % 60000) / 1000)).toString().padStart(2, '0');
@@ -67,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         currentLap.textContent = `${currentLapMinutes}:${currentLapSeconds}.${currentLapMilliseconds}`;
         break;
+      
       case 3:
         var previousLapMinutes = Math.floor((data.PreviousLapTime % 3600000) / 60000);
         var previousLapSeconds = (Math.floor((data.PreviousLapTime % 60000) / 1000)).toString().padStart(2, '0');
@@ -85,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bestLap.textContent = `${bestLapMinutes}:${bestLapSeconds}.${bestLapMilliseconds}`;
         pbLap.textContent = `${pbLapMinutes}:${pbLapSeconds}.${pbLapMilliseconds}`;
         break;
+      
       case 4:
         if (data.AlertCoolantTemp)
           ect.style.setProperty('background-color', 'red')
@@ -100,6 +107,21 @@ document.addEventListener('DOMContentLoaded', () => {
           oilPressure.style.setProperty('background-color', 'red')
         else
           oilPressure.style.setProperty('background-color', 'transparent')
+        break;
+      
+      case 5:
+        if (data.CELAlert) {
+          checkEngineLightAlert.style.setProperty('background-color', 'red');
+          checkEngineLightAlert.classList.add('cel-blinker') 
+        } else {
+          checkEngineLightAlert.style.animation = "";
+        }
+        
+        if (data.DataloggingAlert)
+          dataLoggingAlert.style.setProperty('background-color', 'teal');
+        else
+          dataLoggingAlert.style.setProperty('background-color', 'transparent')
+        break;
     }
   }
 });

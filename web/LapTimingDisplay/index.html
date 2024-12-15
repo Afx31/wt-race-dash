@@ -8,49 +8,52 @@
   <body>
     <script src="/LapTimingDisplay/index.js"></script>
     <div class="container">
-      <div class="rpm-bar-panel">
-        <div id="rpmbar" class="rpm-bar"></div>
-      </div>
-      <div class="rpm-bar-thousands-marks">
-        <div class="rpm-bar-grid-item rpm-bar-grid-item-zero">
-          <div class='rpm-bar-grid-item-p'><p>0</p></div>
-        </div>
-        <div class="rpm-bar-grid-item">
-          <div class='rpm-bar-grid-item-p'><p>1</p></div>
-        </div>
-        <div class="rpm-bar-grid-item">
-          <div class='rpm-bar-grid-item-p'><p>2</p></div>
-        </div>
-        <div class="rpm-bar-grid-item">
-          <div class='rpm-bar-grid-item-p'><p>3</p></div>
-        </div>
-        <div class="rpm-bar-grid-item">
-          <div class='rpm-bar-grid-item-p'><p>4</p></div>
-        </div>
-        <div class="rpm-bar-grid-item">
-          <div class='rpm-bar-grid-item-p'><p>5</p></div>
-        </div>
-        <div class="rpm-bar-grid-item">
-          <div class='rpm-bar-grid-item-p'><p>6</p></div>
-        </div>
-        <div class="rpm-bar-grid-item">
-          <div class='rpm-bar-grid-item-p'><p>7</p></div>
-        </div>
-        <div class="rpm-bar-grid-item">
-          <div class='rpm-bar-grid-item-p'><p>8</p></div>
-        </div>
-        <div class="rpm-bar-grid-item">
-          <div class='rpm-bar-grid-item-p'><p>9</p></div>
-        </div>
-      </div>
 
-      <div id="lap-alert" class="info-panel-lap">
-        <p class="data-title-lap">Lap:</p><p id='lapCount' class='data-title-lap-count'>-</p>
-      </div>
+      <div class="top-panel">
+        <div class="rpm-bar-panel">
+          <div id="rpmbar" class="rpm-bar"></div>
+        </div>
+        <div class="rpm-bar-thousands-marks">
+          <div class="rpm-bar-grid-item rpm-bar-grid-item-zero">
+            <div class='rpm-bar-grid-item-p'><p>0</p></div>
+          </div>
+          <div class="rpm-bar-grid-item">
+            <div class='rpm-bar-grid-item-p'><p>1</p></div>
+          </div>
+          <div class="rpm-bar-grid-item">
+            <div class='rpm-bar-grid-item-p'><p>2</p></div>
+          </div>
+          <div class="rpm-bar-grid-item">
+            <div class='rpm-bar-grid-item-p'><p>3</p></div>
+          </div>
+          <div class="rpm-bar-grid-item">
+            <div class='rpm-bar-grid-item-p'><p>4</p></div>
+          </div>
+          <div class="rpm-bar-grid-item">
+            <div class='rpm-bar-grid-item-p'><p>5</p></div>
+          </div>
+          <div class="rpm-bar-grid-item">
+            <div class='rpm-bar-grid-item-p'><p>6</p></div>
+          </div>
+          <div class="rpm-bar-grid-item">
+            <div class='rpm-bar-grid-item-p'><p>7</p></div>
+          </div>
+          <div class="rpm-bar-grid-item">
+            <div class='rpm-bar-grid-item-p'><p>8</p></div>
+          </div>
+          <div class="rpm-bar-grid-item">
+            <div class='rpm-bar-grid-item-p'><p>9</p></div>
+          </div>
+        </div>
 
-      <!-- <div id="datalogging-alert" class="info-panel-datalogging">
-        <p class="data-title-datalogging">Datalogging</p>
-      </div> -->
+        <div class="info-panel-top-left">
+          <p class="data-title-lap">Lap:</p><p id='lapCount' class='data-title-lap-counter'>-</p>
+        </div>
+        <div class="info-panel-top-right">
+          <p id="celAlert" class="data-title-cel">CEL</p>
+          <p id="dataloggingAlert" class="data-title-datalogging">Log</p>
+        </div>
+      </div>
 
       <div class="middle-panel">
         <!-- Top Row -->
