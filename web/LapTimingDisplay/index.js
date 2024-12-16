@@ -121,6 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
           dataLoggingAlert.style.setProperty('background-color', 'teal');
         else
           dataLoggingAlert.style.setProperty('background-color', 'transparent')
+
+        if (data.ChangePage)
+          window.location.href = 'http://localhost:8080/ShiftLightDisplay/'
+        
         break;
     }
   }
