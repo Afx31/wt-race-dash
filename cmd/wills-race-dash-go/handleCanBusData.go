@@ -193,7 +193,7 @@ func (wsConn *MySocket) HandleCanBusData() {
 		frame := canRecv.Frame()
 		jsonData := canFrameHandler.ProcessCANFrame(frame.ID, frame.Data)
 
-		// Hacky
+		// Hacky but she'll be right for now
 		if ((frame.ID == 67 || frame.ID == 103) && canFrameHandler.FrameMisc.ChangePage) {
 			canFrameHandler.FrameMisc.ChangePage = false
 		}
