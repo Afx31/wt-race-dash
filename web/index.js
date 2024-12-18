@@ -31,28 +31,35 @@ document.addEventListener('DOMContentLoaded', () => {
   socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
   
-    if (data.Type == 1) {
-      // Assign data to UI controls
-      rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
-  
-      // if (tpsBar.style.height !== data.tps + '%')
-        tpsBar.style.height = data.Tps + '%';
-  
-      // if (rpmNum.textContent !== data.rpm)
-        rpmNum.textContent = data.Rpm;
-      
-      // if (speed.textContent !== data.speed)
-        speed.textContent = data.Speed;
-      
-      gear.textContent = data.Gear;
-      voltage.textContent = data.Voltage;  
-      iat.textContent = data.Iat;
-      ect.textContent = data.Ect;
-      tps.textContent = data.Tps;
-      map.textContent = data.Map;
-      lambdaRatio.textContent = data.LambdaRatio;
-      oilTemp.textContent = data.OilTemp;
-      oilPressure.textContent = data.OilPressure;
+    switch (data.Type) {
+      case 1:
+        // Assign data to UI controls
+        rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
+          
+        // if (tpsBar.style.height !== data.tps + '%')
+          tpsBar.style.height = data.Tps + '%';
+
+        // if (rpmNum.textContent !== data.rpm)
+          rpmNum.textContent = data.Rpm;
+
+        // if (speed.textContent !== data.speed)
+          speed.textContent = data.Speed;
+
+        gear.textContent = data.Gear;
+        voltage.textContent = data.Voltage;  
+        iat.textContent = data.Iat;
+        ect.textContent = data.Ect;
+        tps.textContent = data.Tps;
+        map.textContent = data.Map;
+        lambdaRatio.textContent = data.LambdaRatio;
+        oilTemp.textContent = data.OilTemp;
+        oilPressure.textContent = data.OilPressure;
+
+        break;
+      case 5:
+        if (data.ChangePage)
+          window.location.href = 'http://localhost:8080/LapTimingDisplay/'
+        break;
     }
   };
 });
