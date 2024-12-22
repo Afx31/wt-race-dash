@@ -201,8 +201,13 @@ func (wsConn *MySocket) HandleCanBusData() {
 		if jsonData != nil {
 			wsConn.writeToClient(int8(frame.ID), jsonData)
 		}
-	}
+  }
 }
+
+/* --- Note on the below ---
+ * - It's the old implementation for above
+ * - Not removing it as I'll need it to test in car again, to switch between the two
+ */
 
 // type CanData struct {
 // 	Type             int8
