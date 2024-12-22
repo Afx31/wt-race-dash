@@ -33,20 +33,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     switch (data.Type) {
       case 1:
-        rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
-        rpmNum.textContent = data.Rpm;
-        speed.textContent = data.Speed;
-        voltage.textContent = data.Voltage;
-        iat.textContent = data.Iat;
-        ect.textContent = data.Ect;
-        tps.textContent = data.Tps;
-        map.textContent = data.Map;
-        inj.textContent = data.Inj;
-        ign.textContent = data.Ign;
-        lambdaRatio.textContent = data.LambdaRatio;
-        oilTemp.textContent = data.OilTemp;
-        oilPressure.textContent = data.OilPressure;
-        
+        switch (data.FrameId) {
+          case 660:
+            rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
+            rpmNum.textContent = data.Rpm;
+            speed.textContent = data.Speed;
+            voltage.textContent = data.Voltage;
+            break;
+          case 661:
+            iat.textContent = data.Iat;
+            ect.textContent = data.Ect;
+            break;
+          case 662:
+            tps.textContent = data.Tps;
+            map.textContent = data.Map;
+          case 663:
+            inj.textContent = data.Inj;
+            ign.textContent = data.Ign;
+            break;
+          case 664:
+            lambdaRatio.textContent = data.LambdaRatio;
+            break;
+          case 667:
+            oilTemp.textContent = data.OilTemp;
+            oilPressure.textContent = data.OilPressure;
+            break;
+        }
         break;
       case 5:
         if (data.ChangePage)

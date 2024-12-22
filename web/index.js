@@ -33,28 +33,36 @@ document.addEventListener('DOMContentLoaded', () => {
   
     switch (data.Type) {
       case 1:
-        // Assign data to UI controls
-        rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
-          
-        // if (tpsBar.style.height !== data.tps + '%')
-          tpsBar.style.height = data.Tps + '%';
-
-        // if (rpmNum.textContent !== data.rpm)
-          rpmNum.textContent = data.Rpm;
-
-        // if (speed.textContent !== data.speed)
-          speed.textContent = data.Speed;
-
-        gear.textContent = data.Gear;
-        voltage.textContent = data.Voltage;  
-        iat.textContent = data.Iat;
-        ect.textContent = data.Ect;
-        tps.textContent = data.Tps;
-        map.textContent = data.Map;
-        lambdaRatio.textContent = data.LambdaRatio;
-        oilTemp.textContent = data.OilTemp;
-        oilPressure.textContent = data.OilPressure;
-
+        switch (data.FrameId) {
+          case 660:
+            rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
+            // if (rpmNum.textContent !== data.rpm)
+            rpmNum.textContent = data.Rpm;
+            // if (speed.textContent !== data.speed)
+            speed.textContent = data.Speed;
+            gear.textContent = data.Gear;
+            voltage.textContent = data.Voltage;
+            break;
+          case 661:
+            iat.textContent = data.Iat;
+            ect.textContent = data.Ect;
+            break;
+          case 662:
+            // if (tpsBar.style.height !== data.tps + '%')
+            tpsBar.style.height = data.Tps + '%';
+            tps.textContent = data.Tps;
+            map.textContent = data.Map;
+            break;
+          case 663:
+            break;
+          case 664:
+            lambdaRatio.textContent = data.LambdaRatio;
+            break;
+          case 667:
+            oilTemp.textContent = data.OilTemp;
+            oilPressure.textContent = data.OilPressure;
+            break;
+        }
         break;
       case 5:
         if (data.ChangePage)
