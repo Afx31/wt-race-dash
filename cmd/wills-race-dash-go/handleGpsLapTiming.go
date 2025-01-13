@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"math"
 
 	"wills-race-dash-go/internal/tracks"
 
@@ -60,6 +61,38 @@ func isThisTheFinishLine2(currentLat float64, currentLon float64, previousLat fl
 	}
 }
 
+// Use 'Line Segment Intersection' to calc when crossing finish line
+// Lap finished when: [Finish line points (start - finish)] crosses [Movement path points (previous - current)]
+func isThisTheFinishLine3(x3 float64, y3 float64, x4 float64, y4 float64) bool {
+	x1 := currentTrack.LatMin
+	y1 := currentTrack.LonMin
+	x2 := currentTrack.LatMax
+	y2 := currentTrack.LonMax
+
+	// ** We calculate the intersection point on both the finish line AND movement line                
+	// - FinishLine = line across the track (min to max points)
+	// - MovementPath = previous location to current location
+
+	denominator := (x3 - x4) * (y1 - y2) - (y3 - y4) * (x1 - x2)
+
+	// If denominator is 0, the lines are parallel or coincident
+	if (math.Abs(denominator) < 1e-10) {
+		return false
+	}
+
+	// Calculate the numerators
+	tNumerator := (x3 - x1) * (y1 - y2) - (y3 - y1) * (x1 - x2)
+	uNumerator := (x3 - x1) * (y3 - y4) - (y3 - y1) * (x3 - x4)
+
+	// t - Parametric value along the finish line segment
+	// u - Parametric value along the movement path
+	t := tNumerator / denominator
+	u := uNumerator / denominator
+
+	// Check if the intersection happens on both segments
+	return (t >= 0 && t <= 1) && (u >= 0 && u <= 1)
+}
+
 func (wsConn *MySocket) HandleGpsLapTiming() {
 	var gps *gpsd.Session
 	var err error
@@ -106,7 +139,8 @@ func (wsConn *MySocket) HandleGpsLapTiming() {
 		//fmt.Println(isThisTheFinishLine(currentTrack.LatMin, currentTrack.LatMax, report.Lat) && isThisTheFinishLine(currentTrack.LonMin, currentTrack.LonMax, report.Lon))
 
 		//if isThisTheFinishLine(currentTrack.LatMin, currentTrack.LatMax, report.Lat) && isThisTheFinishLine(currentTrack.LonMin, currentTrack.LonMax, report.Lon) {
-		if isThisTheFinishLine2(report.Lat, report.Lon, currentLapData.PreviousLat, currentLapData.PreviousLon) {
+		//if isThisTheFinishLine2(report.Lat, report.Lon, currentLapData.PreviousLat, currentLapData.PreviousLon) {
+		if isThisTheFinishLine3(currentLapData.PreviousLat, currentLapData.PreviousLon, report.Lat, report.Lon) {
 			// Do lap stats
 			if (currentLapData.CurrentLapTime < lapStats.BestLapTime) || lapStats.BestLapTime == 0 {
 				lapStats.BestLapTime = currentLapData.CurrentLapTime
