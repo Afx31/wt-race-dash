@@ -185,7 +185,14 @@ func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data) []byte
 
 func (wsConn *MySocket) HandleCanBusData() {
 	// ---------- CANBus data ----------
-	canConn, _ := socketcan.DialContext(context.Background(), "can", appSettings.CanChannel)
+	canConn, err := socketcan.DialContext(context.Background(), "can", appSettings.CanChannel)
+	if err != nil {
+		// "Failed to connect to CAN channel"
+		fmt.Println("SocketCAN Connection Error: ", err)
+		fmt.Println("==========================================")
+		fmt.Printf("SocketCAN Connection Error: %v", err)
+		fmt.Println("==========================================")
+	}
 	defer canConn.Close()
 	canRecv := socketcan.NewReceiver(canConn)
 
