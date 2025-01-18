@@ -25,39 +25,39 @@ type CANFrameHandler struct {
 }
 
 type CANFrameMisc struct {
-	Type 							int  `json:"Type"`
-	CheckEngineLight	bool `json:"CELAlert`
-	DataloggingAlert 	bool `json:"DataloggingAlert`
+	Type              int  `json:"Type"`
+  CheckEngineLight  bool `json:"CELAlert`
+  DataloggingAlert  bool `json:"DataloggingAlert`
   ChangePage        bool `json:"ChangePage`
 }
 
 type CANFrame660 struct {
-	Type    	int     `json:"Type"`
-	FrameId 	int			`json:"FrameId"`
-	Rpm     	uint16  `json:"Rpm"`
-	Speed   	uint16  `json:"Speed"`
-	Gear    	uint8   `json:"Gear"`
-	Voltage 	float32 `json:"Voltage"`
+  Type      int     `json:"Type"`
+  FrameId   int     `json:"FrameId"`
+  Rpm       uint16  `json:"Rpm"`
+  Speed     uint16  `json:"Speed"`
+  Gear      uint8   `json:"Gear"`
+  Voltage   float32 `json:"Voltage"`
 }
 
 type CANFrame661 struct {
-	Type 			int  		`json:"Type"`
-	FrameId 	int  		`json:"FrameId"`
-	Iat  			uint16 	`json:"Iat"`
-	Ect  			uint16 	`json:"Ect"`
+	Type      int     `json:"Type"`
+	FrameId   int     `json:"FrameId"`
+	Iat       uint16  `json:"Iat"`
+	Ect       uint16  `json:"Ect"`
 }
 
 type CANFrame662 struct {
-	Type 			int    	`json:"Type"`
-	FrameId 	int    	`json:"FrameId"`
-	Tps  			uint16 	`json:"Tps"`
-	Map  			uint16 	`json:"Map"`
+	Type      int     `json:"Type"`
+	FrameId   int     `json:"FrameId"`
+	Tps       uint16  `json:"Tps"`
+	Map       uint16  `json:"Map"`
 }
 
 type CANFrame664 struct {
-	Type        	int     `json:"Type"`
+	Type          int     `json:"Type"`
 	FrameId       int     `json:"FrameId"`
-	LambdaRatio 	float64 `json:"LambdaRatio"`
+	LambdaRatio   float64 `json:"LambdaRatio"`
 }
 
 type CANFrame667 struct {
