@@ -67,9 +67,8 @@ type CANFrame667 struct {
 	OilPressure  uint16 `json:"OilPressure"`
 }
 
-
 var (
-	canFrameHandler = &CANFrameHandler{
+  canFrameHandler = &CANFrameHandler{
 		FrameMisc: CANFrameMisc{ Type: 5 },
 		Frame660: CANFrame660{ Type: 1 },
 		Frame661: CANFrame661{ Type: 1 },
