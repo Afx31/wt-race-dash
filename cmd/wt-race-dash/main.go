@@ -10,7 +10,7 @@ import (
 	"os"
 	"sync"
 
-	"wills-race-dash-go/internal/tracks"
+	"wt-race-dash/internal/tracks"
 
 	"github.com/gorilla/websocket"
 )

@@ -1,5 +1,5 @@
-BINARY_NAME=bin/wills-race-dash-go
-BINARY_DIR=./cmd/wills-race-dash-go
+BINARY_NAME=bin/wt-race-dash
+BINARY_DIR=./cmd/wt-race-dash
 DATALOG_BINARY_NAME=bin/wt-datalogging
 DATALOG_BINARY_DIR=../wt-datalogging
 

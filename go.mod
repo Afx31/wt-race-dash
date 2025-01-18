@@ -1,4 +1,4 @@
-module wills-race-dash-go
+module wt-race-dash
 
 go 1.22.5
 
