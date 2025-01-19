@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"wt-race-dash/pkg/canUtils"
 	"wt-race-dash/pkg/hondata"
 	"wt-race-dash/pkg/mazda"
 
@@ -37,7 +38,7 @@ func (wsConn *MySocket) HandleCanBusData() {
 	switch (appSettings.Car) {
 	case "hondata":
 		canInterface = &hondata.CANFrameHandler{
-			FrameMisc: hondata.CANFrameMisc{ Type: 5 },
+			FrameMisc: canUtils.CANFrameMisc{ Type: 5 },
 			Frame660: hondata.CANFrame660{ Type: 1 },
 			Frame661: hondata.CANFrame661{ Type: 1 },
 			Frame662: hondata.CANFrame662{ Type: 1 },
@@ -46,7 +47,7 @@ func (wsConn *MySocket) HandleCanBusData() {
 		}
 	case "mazda":
 		canInterface = &mazda.CANFrameHandler{
-			FrameMisc: mazda.CANFrameMisc{ Type: 5 },
+			FrameMisc: canUtils.CANFrameMisc{ Type: 5 },
 			Frame201: mazda.CANFrame201{ Type: 1 },
 		}
 	}

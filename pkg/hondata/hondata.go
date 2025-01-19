@@ -12,19 +12,12 @@ import (
 )
 
 type CANFrameHandler struct {
-	FrameMisc CANFrameMisc
+	FrameMisc canUtils.CANFrameMisc
 	Frame660  CANFrame660
 	Frame661  CANFrame661
 	Frame662  CANFrame662
 	Frame664  CANFrame664
 	Frame667  CANFrame667
-}
-
-type CANFrameMisc struct {
-	Type              int  `json:"Type"`
-  CheckEngineLight  bool `json:"CELAlert`
-  DataloggingAlert  bool `json:"DataloggingAlert`
-  ChangePage        bool `json:"ChangePage`
 }
 
 type CANFrame660 struct {
