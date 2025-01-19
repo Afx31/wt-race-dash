@@ -19,6 +19,9 @@ Configurable settings:
 - Datalogging hertz rate
 - Warning alert values
 
+Cars configured for:
+- Hondata S300/KPro
+- Mazda (Currently reverse engineering a 2011 Mazda 6 GH, shows similar values to Mazda3 and RX-8)
 
 ## Tech specs:
 
