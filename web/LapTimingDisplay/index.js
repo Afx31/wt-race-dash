@@ -62,6 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
             oilTemp.textContent = data.OilTemp;
             oilPressure.textContent = data.OilPressure;
             break;
+          case 201: // TODO: Mazda
+            rpmBar.style.width = ((data.Rpm / 9000) * 100) + '%';
+            rpmNum.textContent = data.Rpm;
+            tpsBar.style.height = data.Tps + '%';
+            break;
         }
         break;
       
