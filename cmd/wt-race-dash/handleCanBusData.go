@@ -36,19 +36,26 @@ func (wsConn *MySocket) HandleCanBusData() {
 	canRecv := socketcan.NewReceiver(canConn)
 
 	switch (appSettings.Car) {
-	case "hondata":
+	case "honda":
 		canInterface = &hondata.CANFrameHandler{
 			FrameMisc: canUtils.CANFrameMisc{ Type: 5 },
-			Frame660: hondata.CANFrame660{ Type: 1 },
-			Frame661: hondata.CANFrame661{ Type: 1 },
-			Frame662: hondata.CANFrame662{ Type: 1 },
-			Frame664: hondata.CANFrame664{ Type: 1 },
-			Frame667: hondata.CANFrame667{ Type: 1 },	
+			Frame660: hondata.CANFrame660{ Type: 1, FrameId: 660 },
+			Frame661: hondata.CANFrame661{ Type: 1, FrameId: 661 },
+			Frame662: hondata.CANFrame662{ Type: 1, FrameId: 662 },
+      Frame663: hondata.CANFrame663{ Type: 1, FrameId: 663 },
+			Frame664: hondata.CANFrame664{ Type: 1, FrameId: 664 },
+			Frame667: hondata.CANFrame667{ Type: 1, FrameId: 667 },
+      Frame669: hondata.CANFrame669{ Type: 1, FrameId: 669 },
 		}
+
+    if (appSettings.Ecu == "kpro") {
+      canInterface.(*hondata.CANFrameHandler).Frame665 = hondata.CANFrame665{ Type: 1, FrameId: 665 }
+      canInterface.(*hondata.CANFrameHandler).Frame666 = hondata.CANFrame666{ Type: 1, FrameId: 666 }
+    }
 	case "mazda":
 		canInterface = &mazda.CANFrameHandler{
 			FrameMisc: canUtils.CANFrameMisc{ Type: 5 },
-			Frame201: mazda.CANFrame201{ Type: 1 },
+			Frame201: mazda.CANFrame201{ Type: 1, FrameId: 201 },
 		}
 	}
 
