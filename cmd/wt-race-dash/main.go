@@ -20,7 +20,7 @@ type AppSettings struct {
 	Track					string	`json:"track"`
   LapTiming			bool		`json:"lapTiming"`
 	LoggingHertz	int			`json:"loggingHertz"`
-	CarOrEcu			string	`json:"carOrEcu"`
+	Car						string	`json:"car"`
 	WarningAlerts	bool		`json:"warningAlerts"`
 	WarningValues	map[string]int
 }

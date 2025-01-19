@@ -34,7 +34,7 @@ func (wsConn *MySocket) HandleCanBusData() {
 	defer canConn.Close()
 	canRecv := socketcan.NewReceiver(canConn)
 
-	switch (appSettings.CarOrEcu) {
+	switch (appSettings.Car) {
 	case "hondata":
 		canInterface = &hondata.CANFrameHandler{
 			FrameMisc: hondata.CANFrameMisc{ Type: 5 },
