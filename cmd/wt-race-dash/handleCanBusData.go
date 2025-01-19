@@ -2,20 +2,12 @@ package main
 
 import (
 	"context"
-	// "encoding/binary"
-	// "encoding/json"
 	"fmt"
-	// "log"
-	// "math"
-	// "os/exec"
 	"sync"
 	// "time"
 
 	"go.einride.tech/can"
-	"wt-race-dash/pkg/hondata"
-
 	"go.einride.tech/can/pkg/socketcan"
-	// "wt-race-dash/pkg/datalogging"
 )
 
 type CANInterface interface {
@@ -54,7 +46,7 @@ func (wsConn *MySocket) HandleCanBusData() {
 
 	for canRecv.Receive() {
 		frame := canRecv.Frame()
-	
+
 		jsonData := canInterface.ProcessCANFrame(frame.ID, frame.Data, wg, isDatalogging)
 		
 		if ((frame.ID == 67 || frame.ID == 103) && canInterface.(*hondata.CANFrameHandler).FrameMisc.ChangePage) {

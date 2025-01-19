@@ -66,16 +66,6 @@ type CANFrame667 struct {
 }
 
 var (
-  canFrameHandler = &CANFrameHandler{
-		FrameMisc: CANFrameMisc{ Type: 5 },
-		Frame660: CANFrame660{ Type: 1 },
-		Frame661: CANFrame661{ Type: 1 },
-		Frame662: CANFrame662{ Type: 1 },
-		Frame664: CANFrame664{ Type: 1 },
-		Frame667: CANFrame667{ Type: 1 },
-	}
-	// isDatalogging = false
-
 	// --- Data conversion constants ---
 	// Oil Temp
 	A = 0.0014222095
