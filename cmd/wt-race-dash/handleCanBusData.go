@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	// "time"
+
+	"wt-race-dash/pkg/hondata"
+	"wt-race-dash/pkg/mazda"
 
 	"go.einride.tech/can"
 	"go.einride.tech/can/pkg/socketcan"
@@ -41,6 +43,11 @@ func (wsConn *MySocket) HandleCanBusData() {
 			Frame662: hondata.CANFrame662{ Type: 1 },
 			Frame664: hondata.CANFrame664{ Type: 1 },
 			Frame667: hondata.CANFrame667{ Type: 1 },	
+		}
+	case "mazda":
+		canInterface = &mazda.CANFrameHandler{
+			FrameMisc: mazda.CANFrameMisc{ Type: 5 },
+			Frame201: mazda.CANFrame201{ Type: 1 },
 		}
 	}
 
