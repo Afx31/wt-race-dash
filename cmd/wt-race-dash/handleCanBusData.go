@@ -8,19 +8,23 @@ import (
 	// "log"
 	// "math"
 	// "os/exec"
-	// "sync"
+	"sync"
 	// "time"
 
-	// "go.einride.tech/can"
+	"go.einride.tech/can"
 	"wt-race-dash/pkg/hondata"
 
 	"go.einride.tech/can/pkg/socketcan"
 	// "wt-race-dash/pkg/datalogging"
 )
 
+type CANInterface interface {
+	ProcessCANFrame(frameId uint32, data can.Data, wg sync.WaitGroup, isDatalogging bool) []byte
+}
+
 var (
 	isDatalogging = false
-	tempStruct interface{}
+	canInterface CANInterface
 )
 
 func (wsConn *MySocket) HandleCanBusData() {
@@ -38,7 +42,7 @@ func (wsConn *MySocket) HandleCanBusData() {
 
 	switch (appSettings.CarOrEcu) {
 	case "hondata":
-		tempStruct = &hondata.CANFrameHandler{
+		canInterface = &hondata.CANFrameHandler{
 			FrameMisc: hondata.CANFrameMisc{ Type: 5 },
 			Frame660: hondata.CANFrame660{ Type: 1 },
 			Frame661: hondata.CANFrame661{ Type: 1 },
@@ -46,35 +50,15 @@ func (wsConn *MySocket) HandleCanBusData() {
 			Frame664: hondata.CANFrame664{ Type: 1 },
 			Frame667: hondata.CANFrame667{ Type: 1 },	
 		}
-		break;
 	}
 
 	for canRecv.Receive() {
 		frame := canRecv.Frame()
+	
+		jsonData := canInterface.ProcessCANFrame(frame.ID, frame.Data, wg, isDatalogging)
 		
-		// OLD
-		// jsonData := canFrameHandler.ProcessCANFrame(frame.ID, frame.Data)
-
-		// Hacky but she'll be right for now
-		// if ((frame.ID == 67 || frame.ID == 103) && canFrameHandler.FrameMisc.ChangePage) {
-		// 	canFrameHandler.FrameMisc.ChangePage = false
-		// }
-
-		// if jsonData != nil {
-		// 	wsConn.writeToClient(int8(frame.ID), jsonData)
-		// }
-
-		
-
-		// NEW
-		//jsonData := tempStruct.ProcessCANFrame(frame.ID, frame.Data, wg, isDatalogging)
-		
-		// Asserts the actual type into the interface
-		// TODO: error handle the assert
-		jsonData := tempStruct.(*hondata.CANFrameHandler).ProcessCANFrame(frame.ID, frame.Data, wg, isDatalogging)
-
-		if ((frame.ID == 67 || frame.ID == 103) && tempStruct.(*hondata.CANFrameHandler).FrameMisc.ChangePage) {
-			tempStruct.(*hondata.CANFrameHandler).FrameMisc.ChangePage = false
+		if ((frame.ID == 67 || frame.ID == 103) && canInterface.(*hondata.CANFrameHandler).FrameMisc.ChangePage) {
+			canInterface.(*hondata.CANFrameHandler).FrameMisc.ChangePage = false
 		}
 
 		if jsonData != nil {

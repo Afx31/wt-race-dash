@@ -24,9 +24,9 @@ var (
 
 func (wsConn *MySocket) HandleWarningAlerts() {
 	for {
-		warningAlerts.AlertCoolantTemp = int(tempStruct.(*hondata.CANFrameHandler).Frame661.Ect) > appSettings.WarningValues["warningCoolantTemp"]
-		warningAlerts.AlertOilTemp = int(tempStruct.(*hondata.CANFrameHandler).Frame667.OilTemp) > appSettings.WarningValues["warningOilTemp"]
-		warningAlerts.AlertOilPressure = int(tempStruct.(*hondata.CANFrameHandler).Frame667.OilPressure) > appSettings.WarningValues["warningOilPressure"]
+		warningAlerts.AlertCoolantTemp = int(canInterface.(*hondata.CANFrameHandler).Frame661.Ect) > appSettings.WarningValues["warningCoolantTemp"]
+		warningAlerts.AlertOilTemp = int(canInterface.(*hondata.CANFrameHandler).Frame667.OilTemp) > appSettings.WarningValues["warningOilTemp"]
+		warningAlerts.AlertOilPressure = int(canInterface.(*hondata.CANFrameHandler).Frame667.OilPressure) > appSettings.WarningValues["warningOilPressure"]
 
 		if (previousCoolantTemp != warningAlerts.AlertCoolantTemp) {
 			sendDataTrigger = true
