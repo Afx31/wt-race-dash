@@ -12,22 +12,15 @@ import (
 	// "time"
 
 	// "go.einride.tech/can"
-	"go.einride.tech/can/pkg/socketcan"
 	"wt-race-dash/pkg/hondata"
+
+	"go.einride.tech/can/pkg/socketcan"
 	// "wt-race-dash/pkg/datalogging"
 )
 
 var (
 	isDatalogging = false
-
-	tempStruct = hondata.CANFrameHandler{
-		FrameMisc: hondata.CANFrameMisc{ Type: 5 },
-		Frame660: hondata.CANFrame660{ Type: 1 },
-		Frame661: hondata.CANFrame661{ Type: 1 },
-		Frame662: hondata.CANFrame662{ Type: 1 },
-		Frame664: hondata.CANFrame664{ Type: 1 },
-		Frame667: hondata.CANFrame667{ Type: 1 },	
-	}
+	tempStruct interface{}
 )
 
 func (wsConn *MySocket) HandleCanBusData() {
@@ -42,6 +35,19 @@ func (wsConn *MySocket) HandleCanBusData() {
 	}
 	defer canConn.Close()
 	canRecv := socketcan.NewReceiver(canConn)
+
+	switch (appSettings.CarOrEcu) {
+	case "hondata":
+		tempStruct = &hondata.CANFrameHandler{
+			FrameMisc: hondata.CANFrameMisc{ Type: 5 },
+			Frame660: hondata.CANFrame660{ Type: 1 },
+			Frame661: hondata.CANFrame661{ Type: 1 },
+			Frame662: hondata.CANFrame662{ Type: 1 },
+			Frame664: hondata.CANFrame664{ Type: 1 },
+			Frame667: hondata.CANFrame667{ Type: 1 },	
+		}
+		break;
+	}
 
 	for canRecv.Receive() {
 		frame := canRecv.Frame()
@@ -58,12 +64,17 @@ func (wsConn *MySocket) HandleCanBusData() {
 		// 	wsConn.writeToClient(int8(frame.ID), jsonData)
 		// }
 
+		
 
 		// NEW
-		jsonData := tempStruct.ProcessCANFrame(frame.ID, frame.Data, wg, isDatalogging)
+		//jsonData := tempStruct.ProcessCANFrame(frame.ID, frame.Data, wg, isDatalogging)
+		
+		// Asserts the actual type into the interface
+		// TODO: error handle the assert
+		jsonData := tempStruct.(*hondata.CANFrameHandler).ProcessCANFrame(frame.ID, frame.Data, wg, isDatalogging)
 
-		if ((frame.ID == 67 || frame.ID == 103) && tempStruct.FrameMisc.ChangePage) {
-			tempStruct.FrameMisc.ChangePage = false
+		if ((frame.ID == 67 || frame.ID == 103) && tempStruct.(*hondata.CANFrameHandler).FrameMisc.ChangePage) {
+			tempStruct.(*hondata.CANFrameHandler).FrameMisc.ChangePage = false
 		}
 
 		if jsonData != nil {
