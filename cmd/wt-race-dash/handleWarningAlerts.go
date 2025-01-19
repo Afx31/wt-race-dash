@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"log"
+
+	"wt-race-dash/pkg/hondata"
 )
 
 type WarningAlerts struct {
@@ -22,9 +24,9 @@ var (
 
 func (wsConn *MySocket) HandleWarningAlerts() {
 	for {
-		warningAlerts.AlertCoolantTemp = int(canFrameHandler.Frame661.Ect) > appSettings.WarningValues["warningCoolantTemp"]
-		warningAlerts.AlertOilTemp = int(canFrameHandler.Frame667.OilTemp) > appSettings.WarningValues["warningOilTemp"]
-		warningAlerts.AlertOilPressure = int(canFrameHandler.Frame667.OilPressure) > appSettings.WarningValues["warningOilPressure"]
+		warningAlerts.AlertCoolantTemp = int(canInterface.(*hondata.CANFrameHandler).Frame661.Ect) > appSettings.WarningValues["warningCoolantTemp"]
+		warningAlerts.AlertOilTemp = int(canInterface.(*hondata.CANFrameHandler).Frame667.OilTemp) > appSettings.WarningValues["warningOilTemp"]
+		warningAlerts.AlertOilPressure = int(canInterface.(*hondata.CANFrameHandler).Frame667.OilPressure) > appSettings.WarningValues["warningOilPressure"]
 
 		if (previousCoolantTemp != warningAlerts.AlertCoolantTemp) {
 			sendDataTrigger = true
