@@ -2,13 +2,11 @@ package hondata
 
 import (
 	"encoding/binary"
-	"encoding/json"
-	"log"
 	"math"
 	"sync"
 	"time"
 
-	"wt-race-dash/pkg/datalogging"
+	"wt-race-dash/pkg/canUtils"
 
 	"go.einride.tech/can"
 )
@@ -78,33 +76,24 @@ var (
 	desiredHigh  float64 = 1100 //1000
 )
 
-func (fh *CANFrameHandler) JsonMarshalling(frameData interface{}) []byte {
-	jsonData, err := json.Marshal(frameData)
-	if err != nil {
-		log.Println("Json Marshal error (CAN): ", err)
-		return nil
-	}
-	return jsonData
-}
-
 func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg sync.WaitGroup, isDatalogging bool) []byte {
 	switch (frameId) {
 		case 67, 103:
 			fh.FrameMisc.ChangePage = true
-			return fh.JsonMarshalling(fh.FrameMisc)
+			return canUtils.JsonMarshalling(fh.FrameMisc)
 
 		case 68, 104:
 			wg.Add(1)
-			go datalogging.DoDatalogging(&isDatalogging, &wg)
+			go canUtils.DoDatalogging(&isDatalogging, &wg)
 			time.Sleep(1 * time.Second)
 			isDatalogging = !isDatalogging
 			fh.FrameMisc.DataloggingAlert = isDatalogging
-			return fh.JsonMarshalling(fh.FrameMisc)
+			return canUtils.JsonMarshalling(fh.FrameMisc)
 
 		// case 69, 105:
 			// TODO: Will need to read in whatever the value is and perform the bool conversion below
 			//fh.FrameMisc.CheckEngineLight = !fh.FrameMisc.CheckEngineLight
-			// return fh.JsonMarshalling(fh.FrameMisc)
+			// return canUtils.JsonMarshalling(fh.FrameMisc)
 
 		case 660, 1632:
 			fh.Frame660.FrameId = 660
@@ -112,25 +101,25 @@ func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg syn
 			fh.Frame660.Speed = binary.BigEndian.Uint16(data[2:4])
 			fh.Frame660.Gear = data[4]
 			fh.Frame660.Voltage = float32(data[5]) / 10.0
-			return fh.JsonMarshalling(fh.Frame660)
+			return canUtils.JsonMarshalling(fh.Frame660)
 		
 		case 661, 1633:
 			fh.Frame661.FrameId = 661
 			fh.Frame661.Iat = binary.BigEndian.Uint16(data[0:2])
 			fh.Frame661.Ect = binary.BigEndian.Uint16(data[2:4])
-			return fh.JsonMarshalling(fh.Frame661)
+			return canUtils.JsonMarshalling(fh.Frame661)
 		
 		case 662, 1634:
 			fh.Frame662.FrameId = 662
 			fh.Frame662.Tps = binary.BigEndian.Uint16(data[0:2])
 				if fh.Frame662.Tps == 65535 { fh.Frame662.Tps = 0	}
 			fh.Frame662.Map = binary.BigEndian.Uint16(data[2:4]) / 10
-			return fh.JsonMarshalling(fh.Frame662)
+			return canUtils.JsonMarshalling(fh.Frame662)
 		
 		case 664, 1636:
 			fh.Frame664.FrameId = 664
 			fh.Frame664.LambdaRatio = math.Round(float64(32768.0) / float64(binary.BigEndian.Uint16(data[0:2])) * 100) / 100
-			return fh.JsonMarshalling(fh.Frame664)
+			return canUtils.JsonMarshalling(fh.Frame664)
 		
 		case 667, 1639:
 			fh.Frame667.FrameId = 667
@@ -142,7 +131,7 @@ func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg syn
 			oilPressureResistance := float64(binary.BigEndian.Uint16(data[2:4])) / 819.2
 			kPaValue := ((float64(oilPressureResistance) - originalLow) / (originalHigh - originalLow) * (desiredHigh - desiredLow)) + desiredLow
 			fh.Frame667.OilPressure = uint16(math.Round(kPaValue * 0.145038)) // Convert to psi
-			return fh.JsonMarshalling(fh.Frame667)
+			return canUtils.JsonMarshalling(fh.Frame667)
 
 		default:
 			return nil

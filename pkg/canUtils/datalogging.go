@@ -1,4 +1,4 @@
-package datalogging
+package canUtils
 
 import (
 	"fmt"
