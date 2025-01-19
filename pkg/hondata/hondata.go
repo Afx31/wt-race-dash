@@ -69,7 +69,7 @@ var (
 	desiredHigh  float64 = 1100 //1000
 )
 
-func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg sync.WaitGroup, isDatalogging bool) []byte {
+func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg sync.WaitGroup, ecuType string, isDatalogging bool) []byte {
 	switch (frameId) {
 		case 67, 103:
 			fh.FrameMisc.ChangePage = true

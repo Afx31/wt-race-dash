@@ -23,7 +23,7 @@ type CANFrame201 struct {
 	Tps				float64	`json:"Tps"`
 }
 
-func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg sync.WaitGroup, isDatalogging bool) []byte {
+func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg sync.WaitGroup, ecuType string, isDatalogging bool) []byte {
 	switch (frameId) {
 	case 67, 103:
 		fh.FrameMisc.ChangePage = true
