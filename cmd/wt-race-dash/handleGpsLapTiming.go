@@ -128,7 +128,6 @@ func (wsConn *MySocket) HandleGpsLapTiming() {
 		}
 		convertedCurrentTime := report.Time.In(location)
 
-
 		// ---------- GPS/Lap Timing ----------
 		timeDiff := convertedCurrentTime.Sub(currentLapData.LapStartTime)
 		currentLapData.CurrentLapTime = uint32(timeDiff.Milliseconds())

@@ -95,11 +95,11 @@ type CANFrame667 struct {
 // }
 
 type CANFrame669 struct {
-  Type                    int     `json:"Type"`
-  FrameId                 int     `json:"FrameId"`
-  EthanolFrequency        int     `json:"EthanolFrequency"`
-  EthanolContent          uint16  `json:"EthanolContent"`
-  EthanolFuelTemperature  uint16  `json:"EthanolFuelTemperature"`
+  Type            int     `json:"Type"`
+  FrameId         int     `json:"FrameId"`
+  EthanolInput1		int     `json:"EthanolInput1"`
+  EthanolInput2   float64  `json:"EthanolInput2"`
+  EthanolInput3		uint16  `json:"EthanolInput3"`
 }
 
 var (
@@ -158,7 +158,7 @@ func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg syn
 			return canUtils.JsonMarshalling(fh.Frame662)
 		
     case 663, 1635:
-      fh.Frame663.Inj = binary.BigEndian.Uint16(data[0:2]) / 1000
+			fh.Frame663.Inj = binary.BigEndian.Uint16(data[0:2]) / 1000
 			fh.Frame663.Ign = binary.BigEndian.Uint16(data[2:4])
 			return canUtils.JsonMarshalling(fh.Frame663)
 
@@ -192,9 +192,15 @@ func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg syn
     // case 668, 1640:
 
     case 669, 1641:
-      fh.Frame669.EthanolFrequency = int(binary.BigEndian.Uint16(data[0:1]))
-      fh.Frame669.EthanolContent = binary.BigEndian.Uint16(data[1:2])
-      fh.Frame669.EthanolFuelTemperature = binary.BigEndian.Uint16(data[2:4])
+			fh.Frame669.EthanolInput1 = int(binary.BigEndian.Uint16(data[0:1])) // Frequency
+
+			if (ecuType == "s300") {
+      	fh.Frame669.EthanolInput2 = float64(binary.BigEndian.Uint16(data[1:2])) * 2.56 // Duty
+      	fh.Frame669.EthanolInput3 = binary.BigEndian.Uint16(data[2:3]) // Content
+			} else if (ecuType == "kpro") {
+      	fh.Frame669.EthanolInput2 = float64(binary.BigEndian.Uint16(data[1:2])) // Ethanol Content
+      	fh.Frame669.EthanolInput3 = binary.BigEndian.Uint16(data[2:4]) // Fuel Temperature
+			}
       return canUtils.JsonMarshalling(fh.Frame669)
 
 		default:
