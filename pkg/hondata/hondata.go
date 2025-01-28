@@ -168,14 +168,23 @@ func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg syn
 		
     // K-Pro only
     case 665, 1637:
-      fh.Frame665.KnockCounter = int(binary.BigEndian.Uint16(data[0:2]))
-      return canUtils.JsonMarshalling(fh.Frame665)
+			if (ecuType == "kpro") {
+      	fh.Frame665.KnockCounter = int(binary.BigEndian.Uint16(data[0:2]))
+      	return canUtils.JsonMarshalling(fh.Frame665)
+			} else {
+				return nil
+			}
+			
 
     // K-Pro only
     case 666, 1638:
-      fh.Frame666.TargetCamAngle = float64(binary.BigEndian.Uint16(data[0:2]))
-      fh.Frame666.ActualCamAngle = float64(binary.BigEndian.Uint16(data[2:4]))
-      return canUtils.JsonMarshalling(fh.Frame666)
+			if (ecuType == "kpro") {
+      	fh.Frame666.TargetCamAngle = float64(binary.BigEndian.Uint16(data[0:2]))
+      	fh.Frame666.ActualCamAngle = float64(binary.BigEndian.Uint16(data[2:4]))
+      	return canUtils.JsonMarshalling(fh.Frame666)
+			} else {
+				return nil
+			}
 
 		case 667, 1639:
 			// Oil Temp
