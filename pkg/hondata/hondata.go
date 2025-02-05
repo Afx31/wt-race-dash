@@ -117,11 +117,7 @@ var (
 
 func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg sync.WaitGroup, ecuType string, isDatalogging bool) []byte {
 	switch (frameId) {
-		case 67, 103:
-			fh.FrameMisc.ChangePage = true
-			return canUtils.JsonMarshalling(fh.FrameMisc)
-
-		case 68, 104:
+		case 0x69A:
 			wg.Add(1)
 			go canUtils.DoDatalogging(&isDatalogging, &wg)
 			time.Sleep(1 * time.Second)
@@ -129,7 +125,11 @@ func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg syn
 			fh.FrameMisc.DataloggingAlert = isDatalogging
 			return canUtils.JsonMarshalling(fh.FrameMisc)
 
-		// case 69, 105:
+		case 0x69B:
+			fh.FrameMisc.ChangePage = true
+			return canUtils.JsonMarshalling(fh.FrameMisc)
+
+		// case 0x69C:
 			// TODO: Will need to read in whatever the value is and perform the bool conversion below
 			//fh.FrameMisc.CheckEngineLight = !fh.FrameMisc.CheckEngineLight
 			// return canUtils.JsonMarshalling(fh.FrameMisc)
