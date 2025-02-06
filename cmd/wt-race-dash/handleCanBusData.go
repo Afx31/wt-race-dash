@@ -14,7 +14,7 @@ import (
 )
 
 type CANInterface interface {
-	ProcessCANFrame(frameId uint32, data can.Data, wg sync.WaitGroup, ecuType string, isDatalogging bool) []byte
+	ProcessCANFrame(frameId uint32, data can.Data, wg sync.WaitGroup, ecuType string, isDatalogging *bool) []byte
 }
 
 var (
@@ -62,7 +62,7 @@ func (wsConn *MySocket) HandleCanBusData() {
 	for canRecv.Receive() {
 		frame := canRecv.Frame()
 
-		jsonData := canInterface.ProcessCANFrame(frame.ID, frame.Data, wg, appSettings.Ecu, isDatalogging)
+		jsonData := canInterface.ProcessCANFrame(frame.ID, frame.Data, wg, appSettings.Ecu, &isDatalogging)
 		
 		if ((frame.ID == 67 || frame.ID == 103) && canInterface.(*hondata.CANFrameHandler).FrameMisc.ChangePage) {
 			canInterface.(*hondata.CANFrameHandler).FrameMisc.ChangePage = false

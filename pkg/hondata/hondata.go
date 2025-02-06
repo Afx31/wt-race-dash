@@ -115,14 +115,15 @@ var (
 	desiredHigh  float64 = 1100 //1000
 )
 
-func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg sync.WaitGroup, ecuType string, isDatalogging bool) []byte {
+func (fh *CANFrameHandler) ProcessCANFrame(frameId uint32, data can.Data, wg sync.WaitGroup, ecuType string, isDatalogging *bool) []byte {
 	switch (frameId) {
 		case 0x69A:
+			*isDatalogging = !*isDatalogging
 			wg.Add(1)
-			go canUtils.DoDatalogging(&isDatalogging, &wg)
+			go canUtils.DoDatalogging(isDatalogging, &wg)
 			time.Sleep(1 * time.Second)
-			isDatalogging = !isDatalogging
-			fh.FrameMisc.DataloggingAlert = isDatalogging
+			
+			fh.FrameMisc.DataloggingAlert = *isDatalogging
 			return canUtils.JsonMarshalling(fh.FrameMisc)
 
 		case 0x69B:
