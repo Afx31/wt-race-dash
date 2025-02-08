@@ -29,8 +29,6 @@ func (wsConn *MySocket) HandleCanBusData() {
 		// "Failed to connect to CAN channel"
 		fmt.Println("SocketCAN Connection Error: ", err)
 		fmt.Println("==========================================")
-		fmt.Printf("SocketCAN Connection Error: %v", err)
-		fmt.Println("==========================================")
 	}
 	defer canConn.Close()
 	canRecv := socketcan.NewReceiver(canConn)
